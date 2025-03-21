@@ -11,7 +11,7 @@ function Gallery() {
     axios
       .get("https://jsonplaceholder.typicode.com/photos")
       .then((response) => {
-        setPhotos(response.data.slice(0, 10));
+        setPhotos(response.data.slice(0, 30)); // 30 photos for footer visibility
         setLoading(false);
       })
       .catch((err) => {
@@ -35,19 +35,24 @@ function Gallery() {
     );
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
       {photos.map((photo) => (
-        <div key={photo.id} className="border rounded-lg p-4 shadow-md">
+        <div
+          key={photo.id}
+          className="relative bg-white/20 backdrop-blur-lg border border-white/30 rounded-xl p-4 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1"
+        >
           <img
             src={photo.thumbnailUrl}
             alt={photo.title}
-            className="w-full h-40 object-cover rounded"
-            onError={(e) => (e.target.src = "https://picsum.photos/150")} // Fallback image
+            className="w-full h-48 object-cover rounded-lg mb-3"
+            onError={(e) => (e.target.src = "https://picsum.photos/150")}
           />
-          <h3 className="mt-2 text-lg font-semibold truncate">{photo.title}</h3>
+          <h3 className="text-lg font-semibold text-gray-800 truncate">
+            {photo.title}
+          </h3>
           <Link
             to={`/photo/${photo.id}`}
-            className="mt-2 inline-block bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+            className="mt-3 inline-block bg-gradient-to-r from-blue-500 to-indigo-500 text-white px-4 py-2 rounded-full font-medium hover:from-blue-600 hover:to-indigo-600 transition-all duration-300 transform hover:scale-105"
           >
             View Details
           </Link>
