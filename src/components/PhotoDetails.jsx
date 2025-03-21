@@ -24,8 +24,8 @@ function PhotoDetails() {
   if (loading)
     return (
       <div className="text-center">
-        <div className="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto"></div>
-        <p className="mt-2 text-gray-500">Loading photo...</p>
+        <div className="w-8 h-8 border-4 border-gray-500 border-t-transparent rounded-full animate-spin mx-auto"></div>
+        <p className="mt-2 text-gray-400">Loading photo...</p>
       </div>
     );
   if (error)
@@ -35,45 +35,51 @@ function PhotoDetails() {
       </div>
     );
   if (!photo)
-    return <div className="text-center text-gray-500">Photo not found</div>;
+    return <div className="text-center text-gray-400">Photo not found</div>;
 
   return (
-    <div className="max-w-4xl mx-auto">
-      <div className="relative rounded-xl overflow-hidden shadow-lg">
-        <img
-          src={photo.url}
-          alt={photo.title}
-          className="w-full h-96 object-cover"
-          onError={(e) => (e.target.src = "https://picsum.photos/600")}
-        />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
-        <h2 className="absolute bottom-4 left-4 text-2xl font-bold text-white truncate">
-          {photo.title}
-        </h2>
-      </div>
-      <div className="mt-6 bg-white/20 backdrop-blur-lg border border-white/30 rounded-xl p-6 shadow-lg">
-        <p className="text-gray-600">Photo ID: {photo.id}</p>
-        <Link
-          to="/"
-          className="mt-4 inline-flex items-center bg-gradient-to-r from-blue-500 to-indigo-500 text-white px-4 py-2 rounded-full font-medium hover:from-blue-600 hover:to-indigo-600 transition-all duration-300 transform hover:scale-105"
-        >
-          <svg
-            className="w-5 h-5 mr-2"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-            xmlns="http://www.w3.org/2000/svg"
+    <div className="my-12 mx-auto px-4 md:px-12">
+      <article className="overflow-hidden rounded-lg shadow-lg bg-gray-800 max-w-4xl mx-auto">
+        <div className="relative">
+          <img
+            src={photo.url}
+            alt={photo.title}
+            className="block h-auto w-full hover:opacity-90 transition-opacity"
+            onError={(e) => (e.target.src = "https://picsum.photos/600")}
+          />
+          <p className="absolute right-2 bottom-2 bg-gray-900/80 text-gray-100 text-xs px-2 py-1 rounded">
+            Photo #{photo.id}
+          </p>
+        </div>
+        <header className="flex items-center justify-between leading-tight p-2 md:p-4">
+          <h1 className="text-lg">
+            <span className="text-gray-100 truncate block">{photo.title}</span>
+          </h1>
+        </header>
+        <footer className="flex items-center justify-between leading-none p-2 md:p-4">
+          <p className="text-gray-400 text-sm">Photo ID: {photo.id}</p>
+          <Link
+            to="/"
+            className="inline-flex items-center bg-blue-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-blue-700 transition-colors"
           >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth="2"
-              d="M15 19l-7-7 7-7"
-            />
-          </svg>
-          Back to Gallery
-        </Link>
-      </div>
+            <svg
+              className="w-5 h-5 mr-2"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M15 19l-7-7 7-7"
+              />
+            </svg>
+            Back to Gallery
+          </Link>
+        </footer>
+      </article>
     </div>
   );
 }
