@@ -1,25 +1,12 @@
-import { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
-import axios from "axios";
+import { useSelector } from "react-redux";
 
 function PhotoDetails() {
   const { id } = useParams();
-  const [photo, setPhoto] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const { photos, loading, error } = useSelector((state) => state.photos);
 
-  useEffect(() => {
-    axios
-      .get(`https://jsonplaceholder.typicode.com/photos/${id}`)
-      .then((response) => {
-        setPhoto(response.data);
-        setLoading(false);
-      })
-      .catch((err) => {
-        setError("Failed to fetch photo details");
-        setLoading(false);
-      });
-  }, [id]);
+  // Find the photo by ID from the global state
+  const photo = photos.find((p) => p.id === parseInt(id));
 
   if (loading)
     return (

@@ -1,24 +1,15 @@
-import { useState, useEffect } from "react";
-import axios from "axios";
+import { useEffect } from "react";
+import { useSelector, useDispatch } from "react-redux";
 import { Link } from "react-router-dom";
+import { fetchPhotos } from "../features/photosSlice.js"; // Adjusted path with .js extension
 
 function Gallery() {
-  const [photos, setPhotos] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const dispatch = useDispatch();
+  const { photos, loading, error } = useSelector((state) => state.photos);
 
   useEffect(() => {
-    axios
-      .get("https://jsonplaceholder.typicode.com/photos")
-      .then((response) => {
-        setPhotos(response.data.slice(0, 32)); // 30 photos for footer visibility
-        setLoading(false);
-      })
-      .catch((err) => {
-        setError("Failed to fetch photos");
-        setLoading(false);
-      });
-  }, []);
+    dispatch(fetchPhotos());
+  }, [dispatch]);
 
   if (loading)
     return (
