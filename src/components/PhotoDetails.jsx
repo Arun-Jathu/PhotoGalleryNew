@@ -39,28 +39,31 @@ function PhotoDetails() {
 
   return (
     <div className="my-12 mx-auto px-4 md:px-12">
-      <article className="overflow-hidden rounded-lg shadow-lg bg-gray-800 max-w-4xl mx-auto">
-        <div className="relative">
+      <div className="flex flex-col lg:flex-row lg:space-x-8">
+        {/* Image Section */}
+        <div className="relative lg:w-1/2">
           <img
             src={photo.url}
             alt={photo.title}
-            className="block h-auto w-full hover:opacity-90 transition-opacity"
+            className="w-full max-h-[70vh] object-contain rounded-lg hover:opacity-90 transition-opacity"
             onError={(e) => (e.target.src = "https://picsum.photos/600")}
           />
-          <p className="absolute right-2 bottom-2 bg-gray-900/80 text-gray-100 text-xs px-2 py-1 rounded">
+          <p className="absolute right-4 bottom-4 bg-gray-900/80 text-gray-100 text-sm px-3 py-1 rounded">
             Photo #{photo.id}
           </p>
         </div>
-        <header className="flex items-center justify-between leading-tight p-2 md:p-4">
-          <h1 className="text-lg">
-            <span className="text-gray-100 truncate block">{photo.title}</span>
+        {/* Details Section */}
+        <div className="mt-8 lg:mt-0 lg:w-1/2 flex flex-col justify-center">
+          <h1 className="text-3xl font-bold text-gray-100 mb-4">
+            {photo.title}
           </h1>
-        </header>
-        <footer className="flex items-center justify-between leading-none p-2 md:p-4">
-          <p className="text-gray-400 text-sm">Photo ID: {photo.id}</p>
+          <div className="flex space-x-6 mb-6">
+            <p className="text-gray-400 text-lg">Photo ID: {photo.id}</p>
+            <p className="text-gray-400 text-lg">Album ID: {photo.albumId}</p>
+          </div>
           <Link
             to="/"
-            className="inline-flex items-center bg-blue-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-blue-700 transition-colors"
+            className="inline-flex items-center bg-gradient-to-r from-blue-500 to-indigo-500 text-white px-6 py-3 rounded-full font-medium hover:from-blue-600 hover:to-indigo-600 transition-all duration-300 transform hover:scale-105"
           >
             <svg
               className="w-5 h-5 mr-2"
@@ -78,8 +81,8 @@ function PhotoDetails() {
             </svg>
             Back to Gallery
           </Link>
-        </footer>
-      </article>
+        </div>
+      </div>
     </div>
   );
 }

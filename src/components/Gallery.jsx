@@ -11,7 +11,7 @@ function Gallery() {
     axios
       .get("https://jsonplaceholder.typicode.com/photos")
       .then((response) => {
-        setPhotos(response.data.slice(0, 30)); // 30 photos for footer visibility
+        setPhotos(response.data.slice(0, 32)); // 30 photos for footer visibility
         setLoading(false);
       })
       .catch((err) => {
@@ -40,7 +40,7 @@ function Gallery() {
         {photos.map((photo) => (
           <div
             key={photo.id}
-            className="my-1 px-1 w-full md:w-1/2 lg:my-4 lg:px-4 lg:w-1/3"
+            className="my-1 px-1 w-full md:w-1/2 lg:my-4 lg:px-4 lg:w-1/4"
           >
             <article className="overflow-hidden rounded-lg shadow-lg bg-gray-800">
               <div className="relative">
@@ -71,7 +71,7 @@ function Gallery() {
               <footer className="flex items-center justify-between leading-none p-2 md:p-4">
                 <Link
                   to={`/photo/${photo.id}`}
-                  className="bg-blue-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-blue-700 transition-colors"
+                  className="bg-gradient-to-r from-blue-500 to-indigo-500 text-white px-4 py-2 rounded-full font-medium hover:from-blue-600 hover:to-indigo-600 transition-all duration-300 transform hover:scale-105"
                 >
                   View Details
                 </Link>
