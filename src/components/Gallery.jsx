@@ -115,11 +115,11 @@ function Gallery({ searchTerm = "" }) {
           </motion.div>
         )}
         {filteredPhotos.length > 0 && (
-          <div className="mt-8 flex flex-wrap justify-center space-x-2 sm:space-x-4 items-center">
+          <div className="mt-8 flex justify-center items-center space-x-1 sm:space-x-2">
             <button
               onClick={handleFirstPage}
               disabled={currentPage === 1}
-              className={`px-2 py-1 sm:px-4 sm:py-2 rounded-full font-medium text-white min-w-[80px] sm:min-w-[100px] ${
+              className={`px-2 py-1 sm:px-3 sm:py-2 rounded-full font-medium text-white text-sm sm:text-base min-w-[60px] sm:min-w-[80px] ${
                 currentPage === 1
                   ? "bg-gray-600 cursor-not-allowed opacity-50"
                   : "bg-gradient-to-r from-blue-500 to-indigo-500 hover:from-blue-600 hover:to-indigo-600 transform hover:scale-105"
@@ -130,14 +130,14 @@ function Gallery({ searchTerm = "" }) {
             <button
               onClick={handlePrevPage}
               disabled={currentPage === 1}
-              className={`px-2 py-1 sm:px-4 sm:py-2 rounded-full font-medium text-white min-w-[80px] sm:min-w-[100px] ${
+              className={`p-1 sm:p-2 rounded-full font-medium text-white ${
                 currentPage === 1
                   ? "bg-gray-600 cursor-not-allowed opacity-50"
                   : "bg-gradient-to-r from-blue-500 to-indigo-500 hover:from-blue-600 hover:to-indigo-600 transform hover:scale-105"
               } transition-all duration-300`}
             >
               <svg
-                className="w-5 h-5"
+                className="w-4 h-4 sm:w-5 sm:h-5"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -151,20 +151,20 @@ function Gallery({ searchTerm = "" }) {
                 />
               </svg>
             </button>
-            <span className="text-gray-300 px-2 sm:px-4 bg-blue-500 rounded-full py-1">
+            <span className="text-gray-300 px-2 sm:px-3 py-1 bg-blue-500 rounded-full text-sm sm:text-base">
               Page {currentPage} of {totalPages}
             </span>
             <button
               onClick={handleNextPage}
               disabled={currentPage === totalPages}
-              className={`px-2 py-1 sm:px-4 sm:py-2 rounded-full font-medium text-white min-w-[80px] sm:min-w-[100px] ${
+              className={`p-1 sm:p-2 rounded-full font-medium text-white ${
                 currentPage === totalPages
                   ? "bg-gray-600 cursor-not-allowed opacity-50"
                   : "bg-gradient-to-r from-blue-500 to-indigo-500 hover:from-blue-600 hover:to-indigo-600 transform hover:scale-105"
               } transition-all duration-300`}
             >
               <svg
-                className="w-5 h-5"
+                className="w-4 h-4 sm:w-5 sm:h-5"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -181,7 +181,7 @@ function Gallery({ searchTerm = "" }) {
             <button
               onClick={handleLastPage}
               disabled={currentPage === totalPages}
-              className={`px-2 py-1 sm:px-4 sm:py-2 rounded-full font-medium text-white min-w-[80px] sm:min-w-[100px] ${
+              className={`px-2 py-1 sm:px-3 sm:py-2 rounded-full font-medium text-white text-sm sm:text-base min-w-[60px] sm:min-w-[80px] ${
                 currentPage === totalPages
                   ? "bg-gray-600 cursor-not-allowed opacity-50"
                   : "bg-gradient-to-r from-blue-500 to-indigo-500 hover:from-blue-600 hover:to-indigo-600 transform hover:scale-105"
