@@ -4,7 +4,7 @@ import axios from 'axios';
 // Async thunk to fetch photos
 export const fetchPhotos = createAsyncThunk('photos/fetchPhotos', async () => {
   const response = await axios.get('https://jsonplaceholder.typicode.com/photos');
-  return response.data.slice(0, 30); // Limit to 30 photos
+  return response.data.slice(0, 300); // Limit to 30 photos
 });
 
 const photosSlice = createSlice({

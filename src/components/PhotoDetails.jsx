@@ -1,11 +1,11 @@
 import { useParams, Link } from "react-router-dom";
 import { useSelector } from "react-redux";
+import { motion } from "framer-motion";
 
 function PhotoDetails() {
   const { id } = useParams();
   const { photos, loading, error } = useSelector((state) => state.photos);
 
-  // Find the photo by ID from the global state
   const photo = photos.find((p) => p.id === parseInt(id));
 
   if (loading)
@@ -28,7 +28,12 @@ function PhotoDetails() {
     <div className="my-12 mx-auto px-4 md:px-12">
       <div className="flex flex-col lg:flex-row lg:space-x-8">
         {/* Image Section */}
-        <div className="relative lg:w-1/2">
+        <motion.div
+          className="relative lg:w-1/2"
+          initial={{ opacity: 0, x: -50 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.5 }}
+        >
           <img
             src={photo.url}
             alt={photo.title}
@@ -38,9 +43,14 @@ function PhotoDetails() {
           <p className="absolute right-4 bottom-4 bg-gray-900/80 text-gray-100 text-sm px-3 py-1 rounded">
             Photo #{photo.id}
           </p>
-        </div>
+        </motion.div>
         {/* Details Section */}
-        <div className="mt-8 lg:mt-0 lg:w-1/2 flex flex-col justify-center">
+        <motion.div
+          className="mt-8 lg:mt-0 lg:w-1/2 flex flex-col justify-center"
+          initial={{ opacity: 0, x: 50 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.5, delay: 0.2 }}
+        >
           <h1 className="text-3xl font-bold text-gray-100 mb-4">
             {photo.title}
           </h1>
@@ -68,7 +78,7 @@ function PhotoDetails() {
             </svg>
             Back to Gallery
           </Link>
-        </div>
+        </motion.div>
       </div>
     </div>
   );
