@@ -26,25 +26,12 @@ function Gallery({ searchTerm = "" }) {
     indexOfLastPhoto
   );
 
-  const handleFirstPage = () => {
-    setCurrentPage(1);
-  };
-
-  const handlePrevPage = () => {
-    if (currentPage > 1) {
-      setCurrentPage(currentPage - 1);
-    }
-  };
-
-  const handleNextPage = () => {
-    if (currentPage < totalPages) {
-      setCurrentPage(currentPage + 1);
-    }
-  };
-
-  const handleLastPage = () => {
-    setCurrentPage(totalPages);
-  };
+  const handleFirstPage = () => setCurrentPage(1);
+  const handlePrevPage = () =>
+    currentPage > 1 && setCurrentPage(currentPage - 1);
+  const handleNextPage = () =>
+    currentPage < totalPages && setCurrentPage(currentPage + 1);
+  const handleLastPage = () => setCurrentPage(totalPages);
 
   if (loading)
     return (
@@ -57,46 +44,57 @@ function Gallery({ searchTerm = "" }) {
     return (
       <div className="text-center p-4 bg-red-100 text-red-700 rounded-lg">
         {error}
+        <button
+          onClick={() => dispatch(fetchPhotos())}
+          className="ml-4 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+        >
+          Retry
+        </button>
       </div>
     );
 
   return (
     <div className="my-12 w-full">
-      {/* Photo Grid */}
       <div className="max-w-7xl mx-auto px-4 md:px-12">
         {currentPhotos.length === 0 ? (
           <div className="text-center text-gray-400">No photos found</div>
         ) : (
-          <div className="flex flex-wrap -mx-2 lg:-mx-4">
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.5 }}
+            className="flex flex-wrap -mx-3 lg:-mx-6"
+          >
             {currentPhotos.map((photo, index) => (
               <motion.div
                 key={photo.id}
-                className="my-1 px-2 w-full md:w-1/2 lg:my-4 lg:px-4 lg:w-1/4"
+                className="my-1 px-3 w-full md:w-1/2 lg:my-4 lg:px-6 lg:w-1/4"
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ duration: 0.3, delay: index * 0.1 }}
               >
-                <article className="overflow-hidden rounded-lg shadow-lg bg-gray-800">
+                <article className="overflow-hidden rounded-lg shadow-lg bg-gray-800 min-h-[400px] flex flex-col">
                   <div className="relative">
                     <Link to={`/photo/${photo.id}`}>
                       <img
                         src={photo.thumbnailUrl}
                         alt={photo.title}
-                        className="block h-auto w-full hover:opacity-90 transition-opacity"
+                        loading="lazy"
+                        className="block h-40 w-full object-cover hover:opacity-90 transition-opacity"
                         onError={(e) =>
                           (e.target.src = "https://picsum.photos/150")
                         }
                       />
-                      <p className="absolute right-2 bottom-2 bg-gray-900/80 text-gray-100 text-sm px-2 py-1 rounded">
+                      <p className="absolute right-2 bottom-2 bg-gray-900/90 text-gray-100 text-sm px-2 py-1 rounded">
                         Photo #{photo.id}
                       </p>
                     </Link>
                   </div>
-                  <header className="flex items-center justify-between leading-tight p-2 md:p-4">
-                    <h1 className="text-lg">
+                  <header className="flex items-center justify-between leading-tight p-2 md:p-4 flex-grow">
+                    <h1 className="text-xl">
                       <Link
                         to={`/photo/${photo.id}`}
-                        className="text-gray-100 hover:underline block sm:truncate"
+                        className="text-gray-300 hover:underline block line-clamp-2"
                         title={photo.title}
                       >
                         {photo.title}
@@ -114,9 +112,8 @@ function Gallery({ searchTerm = "" }) {
                 </article>
               </motion.div>
             ))}
-          </div>
+          </motion.div>
         )}
-        {/* Pagination Controls */}
         {filteredPhotos.length > 0 && (
           <div className="mt-8 flex flex-wrap justify-center space-x-2 sm:space-x-4 items-center">
             <button
@@ -124,7 +121,7 @@ function Gallery({ searchTerm = "" }) {
               disabled={currentPage === 1}
               className={`px-2 py-1 sm:px-4 sm:py-2 rounded-full font-medium text-white min-w-[80px] sm:min-w-[100px] ${
                 currentPage === 1
-                  ? "bg-gray-600 cursor-not-allowed"
+                  ? "bg-gray-600 cursor-not-allowed opacity-50"
                   : "bg-gradient-to-r from-blue-500 to-indigo-500 hover:from-blue-600 hover:to-indigo-600 transform hover:scale-105"
               } transition-all duration-300`}
             >
@@ -135,13 +132,26 @@ function Gallery({ searchTerm = "" }) {
               disabled={currentPage === 1}
               className={`px-2 py-1 sm:px-4 sm:py-2 rounded-full font-medium text-white min-w-[80px] sm:min-w-[100px] ${
                 currentPage === 1
-                  ? "bg-gray-600 cursor-not-allowed"
+                  ? "bg-gray-600 cursor-not-allowed opacity-50"
                   : "bg-gradient-to-r from-blue-500 to-indigo-500 hover:from-blue-600 hover:to-indigo-600 transform hover:scale-105"
               } transition-all duration-300`}
             >
-              Previous
+              <svg
+                className="w-5 h-5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M15 19l-7-7 7-7"
+                />
+              </svg>
             </button>
-            <span className="text-gray-400 px-2 sm:px-4">
+            <span className="text-gray-300 px-2 sm:px-4 bg-blue-500 rounded-full py-1">
               Page {currentPage} of {totalPages}
             </span>
             <button
@@ -149,18 +159,31 @@ function Gallery({ searchTerm = "" }) {
               disabled={currentPage === totalPages}
               className={`px-2 py-1 sm:px-4 sm:py-2 rounded-full font-medium text-white min-w-[80px] sm:min-w-[100px] ${
                 currentPage === totalPages
-                  ? "bg-gray-600 cursor-not-allowed"
+                  ? "bg-gray-600 cursor-not-allowed opacity-50"
                   : "bg-gradient-to-r from-blue-500 to-indigo-500 hover:from-blue-600 hover:to-indigo-600 transform hover:scale-105"
               } transition-all duration-300`}
             >
-              Next
+              <svg
+                className="w-5 h-5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M9 5l7 7-7 7"
+                />
+              </svg>
             </button>
             <button
               onClick={handleLastPage}
               disabled={currentPage === totalPages}
               className={`px-2 py-1 sm:px-4 sm:py-2 rounded-full font-medium text-white min-w-[80px] sm:min-w-[100px] ${
                 currentPage === totalPages
-                  ? "bg-gray-600 cursor-not-allowed"
+                  ? "bg-gray-600 cursor-not-allowed opacity-50"
                   : "bg-gradient-to-r from-blue-500 to-indigo-500 hover:from-blue-600 hover:to-indigo-600 transform hover:scale-105"
               } transition-all duration-300`}
             >

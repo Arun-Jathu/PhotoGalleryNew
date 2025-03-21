@@ -15,12 +15,26 @@ function App() {
         {/* Header */}
         <header className="bg-gray-800 shadow-lg w-full sticky top-0 z-10">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex flex-col sm:flex-row items-center justify-between gap-4">
-            {/* Title */}
-            <h1 className="text-2xl font-bold">
+            {/* Title with Logo */}
+            <h1 className="text-2xl font-bold flex items-center">
+              <svg
+                className="w-8 h-8 mr-2"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"
+                />
+              </svg>
               <Link to="/">Photo Gallery</Link>
             </h1>
             {/* Search Bar */}
-            <div className="relative flex items-center border border-gray-600 bg-gray-800 shadow-md rounded-full px-2 w-full sm:w-96">
+            <div className="relative flex items-center border border-gray-600 bg-gray-800 shadow-lg rounded-full px-2 w-full sm:w-96">
               <input
                 type="text"
                 placeholder="Search photos by title"
@@ -50,13 +64,12 @@ function App() {
                 </button>
               )}
               <div className="p-2">
-                <button className="bg-gradient-to-r from-blue-500 to-indigo-500 text-white rounded-full p-2 hover:from-blue-600 hover:to-indigo-600 focus:outline-none w-10 h-10 flex items-center justify-center transition-all duration-300">
+                <button className="bg-gradient-to-r from-blue-500 to-indigo-500 text-white rounded-full p-2 hover:from-blue-600 hover:to-indigo-600 focus:outline-none w-12 h-12 flex items-center justify-center transition-all duration-300">
                   <svg
                     className="w-5 h-5"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
-                    W3C //DTD SVG 1.1//EN"
                     xmlns="http://www.w3.org/2000/svg"
                   >
                     <path
@@ -72,7 +85,7 @@ function App() {
             {/* Navigation Links */}
             <nav className="flex space-x-4">
               <a
-                href="https://github.com/your-username/PhotoGalleryNew"
+                href="https://github.com/example-user/PhotoGalleryNew"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-gray-400 hover:text-gray-100"
@@ -90,11 +103,11 @@ function App() {
           </Routes>
         </main>
         {/* Footer */}
-        <footer className="bg-gray-800 py-4 mt-12 w-full border-t border-gray-700">
+        <footer className="bg-gradient-to-r from-gray-800 to-gray-900 py-4 mt-12 w-full border-t border-gray-700">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-gray-300">
             <p>© 2025 Photo Gallery App. All rights reserved.</p>
             <a
-              href="https://github.com/your-username/PhotoGalleryNew"
+              href="https://github.com/example-user/PhotoGalleryNew"
               target="_blank"
               rel="noopener noreferrer"
               className="text-gray-300 hover:text-gray-100"

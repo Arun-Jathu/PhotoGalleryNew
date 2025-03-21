@@ -1,8 +1,10 @@
 import { useParams, Link } from "react-router-dom";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { motion } from "framer-motion";
+import { fetchPhotos } from "../features/photosSlice.js";
 
 function PhotoDetails() {
+  const dispatch = useDispatch();
   const { id } = useParams();
   const { photos, loading, error } = useSelector((state) => state.photos);
 
@@ -19,6 +21,12 @@ function PhotoDetails() {
     return (
       <div className="text-center p-4 bg-red-100 text-red-700 rounded-lg">
         {error}
+        <button
+          onClick={() => dispatch(fetchPhotos())}
+          className="ml-4 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+        >
+          Retry
+        </button>
       </div>
     );
   if (!photo)
@@ -27,7 +35,6 @@ function PhotoDetails() {
   return (
     <div className="my-12 mx-auto px-4 md:px-12">
       <div className="flex flex-col lg:flex-row lg:space-x-8">
-        {/* Image Section */}
         <motion.div
           className="relative lg:w-1/2"
           initial={{ opacity: 0, x: -50 }}
@@ -37,6 +44,7 @@ function PhotoDetails() {
           <img
             src={photo.url}
             alt={photo.title}
+            loading="lazy"
             className="w-full max-h-[70vh] object-contain rounded-lg hover:opacity-90 transition-opacity"
             onError={(e) => (e.target.src = "https://picsum.photos/600")}
           />
@@ -44,7 +52,6 @@ function PhotoDetails() {
             Photo #{photo.id}
           </p>
         </motion.div>
-        {/* Details Section */}
         <motion.div
           className="mt-8 lg:mt-0 lg:w-1/2 flex flex-col justify-center"
           initial={{ opacity: 0, x: 50 }}
