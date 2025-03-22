@@ -72,10 +72,14 @@ The output will be in the `dist` folder, which you can deploy to a hosting servi
 
 ## Screenshots
 
-- **Gallery View (Desktop)**:
-- **Gallery View (Mobile)**:
-- **Photo Details View (Desktop)**:
-- **Photo Details View (Mobile)**:
+- **Gallery View (Desktop)**:  
+  ![Gallery Desktop](screenshots/gallery-desktop.png)
+- **Gallery View (Mobile)**:  
+  ![Gallery Mobile](screenshots/gallery-mobile.png)
+- **Photo Details View (Desktop)**:  
+  ![Photo Details Desktop](screenshots/photo-details-desktop.png)
+- **Photo Details View (Mobile)**:  
+  ![Photo Details Mobile](screenshots/photo-details-mobile.png)
 
 ## Project Structure
 
@@ -128,12 +132,12 @@ This approach ensures that the app’s state is predictable, scalable, and easy 
 
 This project is submitted as part of the application for the **Frontend Developer** position at **GrayCorp**. The GitHub repository for this project can be found at:
 
-[GitHub Repository](https://github.com/your-username/PhotoGalleryNew)
+[GitHub Repository](https://github.com/Arun-Jathu/PhotoGalleryNew)
 
 A live demo of the app is available at:
 
 [Live Demo](https://jathuphotogalleryapp.netlify.app/)
 
-For any questions, please contact me at [your-email@example.com].
+For any questions, please contact me at [arunjathu0@gmail.com].
 
 **Submitted to:** careers@graycorp.io
