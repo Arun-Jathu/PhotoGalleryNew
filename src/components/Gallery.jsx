@@ -54,7 +54,7 @@ function Gallery({ searchTerm = "" }) {
     );
 
   return (
-    <div className="my-12 w-full">
+    <div className="my-12 sm:mt-12 mt-16 w-full">
       <div className="max-w-7xl mx-auto px-4 md:px-12">
         {currentPhotos.length === 0 ? (
           <div className="text-center text-gray-400">No photos found</div>

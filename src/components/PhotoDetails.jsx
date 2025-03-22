@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { motion } from "framer-motion";
@@ -8,6 +9,13 @@ function PhotoDetails() {
   const navigate = useNavigate();
   const { id } = useParams();
   const { photos, loading, error } = useSelector((state) => state.photos);
+
+  // Fetch photos on mount if the photos array is empty
+  useEffect(() => {
+    if (photos.length === 0) {
+      dispatch(fetchPhotos());
+    }
+  }, [dispatch, photos.length]);
 
   const photo = photos.find((p) => p.id === parseInt(id));
   const currentIndex = photos.findIndex((p) => p.id === parseInt(id));
@@ -44,7 +52,7 @@ function PhotoDetails() {
     return <div className="text-center text-gray-400">Photo not found</div>;
 
   return (
-    <div className="my-12 mx-auto px-4 md:px-12 max-w-5xl">
+    <div className="my-12 sm:mt-12 mt-16 mx-auto px-4 md:px-12 max-w-5xl">
       <div className="flex flex-col lg:flex-row lg:space-x-8 items-center">
         <motion.div
           className="relative lg:w-3/5 p-4"
@@ -65,17 +73,19 @@ function PhotoDetails() {
           </p>
         </motion.div>
         <motion.div
-          className="mt-8 lg:mt-0 lg:w-2/5 flex flex-col justify-center items-center text-center bg-gray-800 rounded-lg p-6 shadow-lg"
+          className="mt-8 lg:mt-0 lg:w-2/5 flex flex-col justify-between items-center text-center bg-gray-800 rounded-lg p-6 shadow-lg min-h-[400px]"
           initial={{ opacity: 0, x: 50 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.5, delay: 0.2 }}
         >
-          <h1 className="text-4xl font-bold text-gray-100 mb-8">
-            {photo.title}
-          </h1>
-          <div className="flex space-x-8 mb-8">
-            <p className="text-gray-300 text-lg">Photo ID: {photo.id}</p>
-            <p className="text-gray-300 text-lg">Album ID: {photo.albumId}</p>
+          <div>
+            <h1 className="text-4xl font-bold text-gray-100 mb-8 line-clamp-2">
+              {photo.title}
+            </h1>
+            <div className="flex space-x-8 mb-8">
+              <p className="text-gray-300 text-lg">Photo ID: {photo.id}</p>
+              <p className="text-gray-300 text-lg">Album ID: {photo.albumId}</p>
+            </div>
           </div>
           <div className="flex flex-col space-y-4">
             <Link
