@@ -4,29 +4,31 @@ import { useSelector, useDispatch } from "react-redux";
 import { motion } from "framer-motion";
 import { fetchPhotos } from "../features/photosSlice.js";
 
+// PhotoDetails component: Displays detailed info for a single photo
 function PhotoDetails() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { id } = useParams();
   const { photos, loading, error } = useSelector((state) => state.photos);
 
-  // State for description and editing mode
+  // State for description editing
   const [description, setDescription] = useState("");
   const [isEditing, setIsEditing] = useState(false);
   const [tempDescription, setTempDescription] = useState("");
 
+  // Fetch photos and load description from localStorage on mount
   useEffect(() => {
     if (photos.length === 0) {
       dispatch(fetchPhotos());
     }
 
-    // Load description from localStorage when the component mounts
     const savedDescription = localStorage.getItem(`photo-description-${id}`);
     if (savedDescription) {
       setDescription(savedDescription);
     }
   }, [dispatch, photos.length, id]);
 
+  // Find the current photo and related photos
   const photo = photos.find((p) => p.id === parseInt(id));
   const currentIndex = photos.findIndex((p) => p.id === parseInt(id));
   const prevPhotoId = currentIndex > 0 ? photos[currentIndex - 1].id : null;
@@ -36,13 +38,14 @@ function PhotoDetails() {
     .filter((p) => p.albumId === (photo?.albumId || 0) && p.id !== parseInt(id))
     .slice(0, 3); // Get up to 3 related photos from the same album
 
+  // Navigate to the next photo when clicking the image
   const handleImageClick = () => {
     if (nextPhotoId) {
       navigate(`/photo/${nextPhotoId}`);
     }
   };
 
-  // Download functionality
+  // Download the photo as a file
   const handleDownload = async (url, title) => {
     try {
       const response = await fetch(url);
@@ -50,7 +53,7 @@ function PhotoDetails() {
       const downloadUrl = window.URL.createObjectURL(blob);
       const link = document.createElement("a");
       link.href = downloadUrl;
-      link.download = `${title}.jpg`; // Use the photo title as the file name
+      link.download = `${title}.jpg`;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
@@ -61,7 +64,7 @@ function PhotoDetails() {
     }
   };
 
-  // Handle description editing
+  // Description editing handlers
   const handleEditDescription = () => {
     setTempDescription(description);
     setIsEditing(true);
@@ -78,6 +81,7 @@ function PhotoDetails() {
     setIsEditing(false);
   };
 
+  // Show loading spinner while fetching photos
   if (loading)
     return (
       <div className="text-center py-12">
@@ -85,6 +89,8 @@ function PhotoDetails() {
         <p className="mt-4 text-gray-400 text-lg">Loading photo...</p>
       </div>
     );
+
+  // Show error message if fetch fails
   if (error)
     return (
       <div className="text-center p-6 bg-red-100 text-red-700 rounded-lg">
@@ -97,6 +103,8 @@ function PhotoDetails() {
         </button>
       </div>
     );
+
+  // Show message if photo is not found
   if (!photo)
     return (
       <div className="text-center text-gray-400 text-lg py-12">
@@ -281,6 +289,7 @@ function PhotoDetails() {
                   </svg>
                   <div className="flex-1">
                     {isEditing ? (
+                      // Description editing form
                       <div className="space-y-4">
                         <textarea
                           value={tempDescription}

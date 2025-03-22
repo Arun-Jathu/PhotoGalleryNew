@@ -6,7 +6,9 @@ import Gallery from "./components/Gallery.jsx";
 import PhotoDetails from "./components/PhotoDetails.jsx";
 import "./App.css";
 
+// Main App component: Sets up routing, header, and search functionality
 function App() {
+  // State for search and header toggle
   const [searchTerm, setSearchTerm] = useState("");
   const [isHeaderExpanded, setIsHeaderExpanded] = useState(() => {
     if (typeof window !== "undefined") {
@@ -15,6 +17,7 @@ function App() {
     return true;
   });
 
+  // Handle header toggle on window resize
   useEffect(() => {
     const handleResize = () => {
       setIsHeaderExpanded(window.innerWidth >= 640);
@@ -24,13 +27,15 @@ function App() {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
+  // Toggle header visibility on mobile
   const toggleHeader = () => {
     setIsHeaderExpanded(!isHeaderExpanded);
   };
 
   return (
+    // Wrap app with Redux Provider for state management
     <Provider store={store}>
-      <div className="min-h-screen bg-gray-800 text-gray-100 flex flex-col font-sans">
+      <div className="min-h-screen bg-gradient-to-b from-gray-800 to-gray-900 text-gray-100 flex flex-col font-sans">
         {/* Header */}
         <header className="bg-gray-900 shadow-xl w-full sticky top-0 z-10">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex flex-col sm:flex-row sm:items-center sm:justify-between">
@@ -55,7 +60,7 @@ function App() {
               </h1>
               <button
                 onClick={toggleHeader}
-                className="sm:hidden bg-teal-500 text-white rounded-full p-3 hover:bg-teal-600 transition-all duration-300"
+                className="sm:hidden bg-teal-500 text-white rounded-full p-3 hover:bg-teal-600 transition-all duration-300 focus:ring-2 focus:ring-teal-400 focus:outline-none"
               >
                 <svg
                   className="w-6 h-6"
@@ -99,7 +104,7 @@ function App() {
                 {searchTerm && (
                   <button
                     onClick={() => setSearchTerm("")}
-                    className="absolute right-12 text-gray-400 hover:text-gray-100 transition-colors duration-200"
+                    className="absolute right-12 text-gray-400 hover:text-gray-100 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-teal-400 rounded"
                   >
                     <svg
                       className="w-5 h-5"
@@ -141,7 +146,7 @@ function App() {
                   href="https://github.com/example-user/PhotoGalleryNew"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-teal-400 hover:text-teal-300 transition-colors duration-200"
+                  className="text-teal-400 hover:text-teal-300 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-teal-400 rounded"
                 >
                   GitHub
                 </a>
@@ -151,6 +156,7 @@ function App() {
         </header>
         {/* Main Content */}
         <main className="w-full flex-grow">
+          {/* App Routes */}
           <Routes>
             <Route path="/" element={<Gallery searchTerm={searchTerm} />} />
             <Route path="/photo/:id" element={<PhotoDetails />} />
@@ -164,7 +170,7 @@ function App() {
               href="https://github.com/example-user/PhotoGalleryNew"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-teal-400 hover:text-teal-300 transition-colors duration-200"
+              className="text-teal-400 hover:text-teal-300 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-teal-400 rounded"
             >
               GitHub Portfolio
             </a>

@@ -4,22 +4,27 @@ import { Link } from "react-router-dom";
 import { fetchPhotos } from "../features/photosSlice.js";
 import { motion } from "framer-motion";
 
+// Gallery component: Displays a paginated grid of photos with search and description editing
 function Gallery({ searchTerm = "" }) {
   const dispatch = useDispatch();
   const { photos, loading, error } = useSelector((state) => state.photos);
+  // State for pagination and description editing
   const [currentPage, setCurrentPage] = useState(1);
   const [editingPhotoId, setEditingPhotoId] = useState(null);
   const [tempDescription, setTempDescription] = useState("");
   const photosPerPage = 8;
 
+  // Fetch photos on component mount
   useEffect(() => {
     dispatch(fetchPhotos());
   }, [dispatch]);
 
+  // Filter photos based on search term
   const filteredPhotos = photos.filter((photo) =>
     photo.title.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
+  // Calculate pagination values
   const totalPages = Math.ceil(filteredPhotos.length / photosPerPage);
   const indexOfLastPhoto = currentPage * photosPerPage;
   const indexOfFirstPhoto = indexOfLastPhoto - photosPerPage;
@@ -28,6 +33,7 @@ function Gallery({ searchTerm = "" }) {
     indexOfLastPhoto
   );
 
+  // Pagination handlers
   const handleFirstPage = () => setCurrentPage(1);
   const handlePrevPage = () =>
     currentPage > 1 && setCurrentPage(currentPage - 1);
@@ -35,7 +41,7 @@ function Gallery({ searchTerm = "" }) {
     currentPage < totalPages && setCurrentPage(currentPage + 1);
   const handleLastPage = () => setCurrentPage(totalPages);
 
-  // Handle description editing
+  // Description editing handlers
   const handleEditDescription = (photoId, currentDescription) => {
     setEditingPhotoId(photoId);
     setTempDescription(currentDescription || "");
@@ -51,6 +57,7 @@ function Gallery({ searchTerm = "" }) {
     setTempDescription("");
   };
 
+  // Show loading spinner while fetching photos
   if (loading)
     return (
       <div className="text-center py-12">
@@ -58,6 +65,8 @@ function Gallery({ searchTerm = "" }) {
         <p className="mt-4 text-gray-400 text-lg">Loading photos...</p>
       </div>
     );
+
+  // Show error message if fetch fails
   if (error)
     return (
       <div className="text-center p-6 bg-red-100 text-red-700 rounded-lg">
@@ -79,6 +88,7 @@ function Gallery({ searchTerm = "" }) {
             No photos found
           </div>
         ) : (
+          // Photo grid with animation
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -123,6 +133,7 @@ function Gallery({ searchTerm = "" }) {
                         Photo #{photo.id}
                       </p>
                       {editingPhotoId === photo.id ? (
+                        // Description editing form
                         <div className="space-y-4">
                           <textarea
                             value={tempDescription}
@@ -147,6 +158,7 @@ function Gallery({ searchTerm = "" }) {
                           </div>
                         </div>
                       ) : (
+                        // Display description or prompt to add one
                         <div className="space-y-2">
                           {savedDescription ? (
                             <p className="text-gray-300 text-sm line-clamp-2">
@@ -186,6 +198,7 @@ function Gallery({ searchTerm = "" }) {
           </motion.div>
         )}
         {filteredPhotos.length > 0 && (
+          // Pagination controls
           <div className="mt-12 flex justify-center items-center space-x-3">
             <button
               onClick={handleFirstPage}
