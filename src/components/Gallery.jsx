@@ -8,6 +8,8 @@ function Gallery({ searchTerm = "" }) {
   const dispatch = useDispatch();
   const { photos, loading, error } = useSelector((state) => state.photos);
   const [currentPage, setCurrentPage] = useState(1);
+  const [editingPhotoId, setEditingPhotoId] = useState(null);
+  const [tempDescription, setTempDescription] = useState("");
   const photosPerPage = 8;
 
   useEffect(() => {
@@ -32,6 +34,22 @@ function Gallery({ searchTerm = "" }) {
   const handleNextPage = () =>
     currentPage < totalPages && setCurrentPage(currentPage + 1);
   const handleLastPage = () => setCurrentPage(totalPages);
+
+  // Handle description editing
+  const handleEditDescription = (photoId, currentDescription) => {
+    setEditingPhotoId(photoId);
+    setTempDescription(currentDescription || "");
+  };
+
+  const handleSaveDescription = (photoId) => {
+    localStorage.setItem(`photo-description-${photoId}`, tempDescription);
+    setEditingPhotoId(null);
+  };
+
+  const handleCancelEdit = () => {
+    setEditingPhotoId(null);
+    setTempDescription("");
+  };
 
   if (loading)
     return (
@@ -67,16 +85,19 @@ function Gallery({ searchTerm = "" }) {
             transition={{ duration: 0.5 }}
             className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6"
           >
-            {currentPhotos.map((photo, index) => (
-              <motion.div
-                key={photo.id}
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.3, delay: index * 0.1 }}
-                className="relative"
-              >
-                <article className="overflow-hidden rounded-xl shadow-lg bg-gray-900 min-h-[400px] flex flex-col transform hover:scale-105 transition-transform duration-300">
-                  <div className="relative">
+            {currentPhotos.map((photo, index) => {
+              const savedDescription = localStorage.getItem(
+                `photo-description-${photo.id}`
+              );
+              return (
+                <motion.div
+                  key={photo.id}
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ duration: 0.3, delay: index * 0.1 }}
+                  className="relative"
+                >
+                  <article className="overflow-hidden rounded-xl shadow-lg bg-gray-900 border border-gray-700/50 transform hover:scale-105 transition-transform duration-300">
                     <Link to={`/photo/${photo.id}`}>
                       <img
                         src={photo.thumbnailUrl}
@@ -87,33 +108,72 @@ function Gallery({ searchTerm = "" }) {
                           (e.target.src = "https://picsum.photos/150")
                         }
                       />
-                      <p className="absolute right-3 bottom-3 bg-gray-900/80 text-gray-100 text-sm px-3 py-1 rounded-full font-medium">
+                    </Link>
+                    <div className="p-4 flex flex-col">
+                      <h3 className="text-base font-medium text-gray-200 line-clamp-2 mb-2">
+                        <Link
+                          to={`/photo/${photo.id}`}
+                          className="hover:text-teal-400 transition-colors duration-200"
+                          title={photo.title}
+                        >
+                          {photo.title}
+                        </Link>
+                      </h3>
+                      <p className="text-gray-400 text-sm mb-2">
                         Photo #{photo.id}
                       </p>
-                    </Link>
-                  </div>
-                  <header className="flex items-center justify-between leading-tight p-4 flex-grow">
-                    <h1 className="text-lg font-medium text-gray-200 line-clamp-2">
-                      <Link
-                        to={`/photo/${photo.id}`}
-                        className="hover:text-teal-400 transition-colors duration-200"
-                        title={photo.title}
-                      >
-                        {photo.title}
-                      </Link>
-                    </h1>
-                  </header>
-                  <footer className="p-4">
-                    <Link
-                      to={`/photo/${photo.id}`}
-                      className="bg-teal-500 text-white px-6 py-2 rounded-full font-medium hover:bg-teal-600 transition-all duration-300 transform hover:scale-105 focus:ring-2 focus:ring-teal-400 focus:outline-none"
-                    >
-                      View Details
-                    </Link>
-                  </footer>
-                </article>
-              </motion.div>
-            ))}
+                      {editingPhotoId === photo.id ? (
+                        <div className="space-y-4">
+                          <textarea
+                            value={tempDescription}
+                            onChange={(e) => setTempDescription(e.target.value)}
+                            placeholder="Enter a description for this photo..."
+                            className="w-full p-3 rounded-lg bg-gray-700 text-gray-100 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-teal-500 transition-all duration-300"
+                            rows="3"
+                          />
+                          <div className="flex space-x-3">
+                            <button
+                              onClick={() => handleSaveDescription(photo.id)}
+                              className="bg-teal-500 text-white px-4 py-2 rounded-full font-medium hover:bg-teal-600 transition-all duration-300 transform hover:scale-105 focus:ring-2 focus:ring-teal-400 focus:outline-none"
+                            >
+                              Save
+                            </button>
+                            <button
+                              onClick={handleCancelEdit}
+                              className="bg-gray-600 text-gray-100 px-4 py-2 rounded-full font-medium hover:bg-gray-500 transition-all duration-300 transform hover:scale-105 focus:ring-2 focus:ring-teal-400 focus:outline-none"
+                            >
+                              Cancel
+                            </button>
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="space-y-2">
+                          {savedDescription ? (
+                            <p className="text-gray-300 text-sm line-clamp-2">
+                              {savedDescription}
+                            </p>
+                          ) : (
+                            <p className="text-gray-400 text-sm italic">
+                              No description available.
+                            </p>
+                          )}
+                          <button
+                            onClick={() =>
+                              handleEditDescription(photo.id, savedDescription)
+                            }
+                            className="text-teal-400 hover:text-teal-300 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-teal-400 rounded text-sm"
+                          >
+                            {savedDescription
+                              ? "Edit Description"
+                              : "Add Description"}
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  </article>
+                </motion.div>
+              );
+            })}
           </motion.div>
         )}
         {filteredPhotos.length > 0 && (
