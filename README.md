@@ -1,12 +1,40 @@
-# React + Vite
+# Photo Gallery App
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+The Photo Gallery App is a modern, responsive web application built with React and Redux, designed to display and manage a collection of photos. It fetches photo data from a public API (JSONPlaceholder) and allows users to browse photos in a grid view, view detailed information about each photo, and add/edit descriptions for photos. The app features a sleek dark theme, consistent design across all interfaces, and a focus on usability and accessibility.
 
-Currently, two official plugins are available:
+## Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- **Photo Grid View**: Browse photos in a responsive grid layout with search and pagination functionality.
+- **Photo Details View**: View detailed information about each photo, including metadata and related photos from the same album.
+- **Description Editing**: Add and edit descriptions for photos directly from both the Gallery and Photo Details pages, with data persisted in `localStorage`.
+- **Consistent Design**: Modern dark theme with teal accents, consistent card designs, and hover effects across all interfaces.
+- **Responsive Layout**: Fully responsive design that works seamlessly on desktop and mobile devices.
+- **Accessibility**: Keyboard navigation, focus states for interactive elements, and screen reader support.
+- **Download Photos**: Download individual photos from the Photo Details page.
+- **Error Handling**: Graceful handling of loading and error states with user-friendly messages.
 
-## Expanding the ESLint configuration
+## Screenshots
 
-If you are developing a production application, we recommend using TypeScript and enable type-aware lint rules. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+- **Gallery View (Desktop)**:  
+  ![Gallery Desktop](screenshots/gallery-desktop.png)
+- **Gallery View (Mobile)**:  
+  ![Gallery Mobile](screenshots/gallery-mobile.png)
+- **Photo Details View (Desktop)**:  
+  ![Photo Details Desktop](screenshots/photo-details-desktop.png)
+- **Photo Details View (Mobile)**:  
+  ![Photo Details Mobile](screenshots/photo-details-mobile.png)
+
+## Setup Instructions
+
+### Prerequisites
+
+- **Node.js**: Version 14.x or higher (recommended: 18.x)
+- **npm**: Version 6.x or higher (or use Yarn if preferred)
+
+### Installation
+
+1. **Clone the Repository**:
+   ```bash
+   git clone https://github.com/example-user/PhotoGalleryNew.git
+   cd PhotoGalleryNew
+   ```

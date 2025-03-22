@@ -169,6 +169,15 @@ function Gallery({ searchTerm = "" }) {
                           </button>
                         </div>
                       )}
+                      {/* View Details Button */}
+                      <div className="mt-4">
+                        <Link
+                          to={`/photo/${photo.id}`}
+                          className="inline-block bg-teal-500 text-white px-6 py-2 rounded-full font-medium hover:bg-teal-600 transition-all duration-300 transform hover:scale-105 focus:ring-2 focus:ring-teal-400 focus:outline-none"
+                        >
+                          View Details
+                        </Link>
+                      </div>
                     </div>
                   </article>
                 </motion.div>
