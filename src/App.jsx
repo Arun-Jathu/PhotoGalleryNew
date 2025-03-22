@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react"; // Added useEffect
+import { useState, useEffect } from "react";
 import { Routes, Route, Link } from "react-router-dom";
 import { Provider } from "react-redux";
 import { store } from "./store.js";
@@ -7,26 +7,20 @@ import PhotoDetails from "./components/PhotoDetails.jsx";
 import "./App.css";
 
 function App() {
-  // Initialize isHeaderExpanded based on screen size
   const [searchTerm, setSearchTerm] = useState("");
   const [isHeaderExpanded, setIsHeaderExpanded] = useState(() => {
-    // Check if window is defined (for server-side rendering compatibility)
     if (typeof window !== "undefined") {
-      // Tailwind's sm breakpoint is 640px
       return window.innerWidth >= 640;
     }
-    // Default to true for desktop if window is not defined (e.g., during SSR)
     return true;
   });
 
-  // Update isHeaderExpanded when the window is resized (optional, for responsiveness)
   useEffect(() => {
     const handleResize = () => {
       setIsHeaderExpanded(window.innerWidth >= 640);
     };
 
     window.addEventListener("resize", handleResize);
-    // Cleanup the event listener on component unmount
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
@@ -36,14 +30,13 @@ function App() {
 
   return (
     <Provider store={store}>
-      <div className="min-h-screen bg-gray-900 text-gray-100 flex flex-col">
+      <div className="min-h-screen bg-gray-800 text-gray-100 flex flex-col font-sans">
         {/* Header */}
-        <header className="bg-gray-800 shadow-lg w-full sticky top-0 z-10">
+        <header className="bg-gray-900 shadow-xl w-full sticky top-0 z-10">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex flex-col sm:flex-row sm:items-center sm:justify-between">
-            {/* Logo and Toggle Symbol (mobile layout) */}
+            {/* Logo and Toggle Symbol */}
             <div className="flex items-center justify-between sm:justify-start sm:flex-1">
-              {/* Logo (always visible) */}
-              <h1 className="text-2xl font-bold flex items-center">
+              <h1 className="text-2xl font-semibold flex items-center text-teal-300">
                 <svg
                   className="w-8 h-8 mr-2"
                   fill="none"
@@ -60,10 +53,9 @@ function App() {
                 </svg>
                 <Link to="/">Photo Gallery</Link>
               </h1>
-              {/* Toggle Symbol (visible on mobile only) */}
               <button
                 onClick={toggleHeader}
-                className="sm:hidden bg-gradient-to-r from-blue-500 to-indigo-500 text-white rounded-full p-3 hover:from-blue-600 hover:to-indigo-600 transition-all duration-300"
+                className="sm:hidden bg-teal-500 text-white rounded-full p-3 hover:bg-teal-600 transition-all duration-300"
               >
                 <svg
                   className="w-6 h-6"
@@ -90,25 +82,24 @@ function App() {
                 </svg>
               </button>
             </div>
-            {/* Search Bar and GitHub Link (collapsible on mobile, always visible on desktop) */}
+            {/* Search Bar and GitHub Link */}
             <div
               className={`sm:flex sm:items-center sm:space-x-4 w-full sm:w-auto mt-4 sm:mt-0 ${
                 isHeaderExpanded ? "block" : "hidden"
-              } sm:block`} // Hide on mobile when collapsed, always show on sm+
+              } sm:block`}
             >
-              {/* Search Bar */}
-              <div className="relative flex items-center border border-gray-600 bg-gray-800 shadow-lg rounded-full px-2 w-full sm:w-64 md:w-72 lg:w-80">
+              <div className="relative flex items-center border border-gray-600 bg-gray-700 shadow-inner rounded-full px-2 w-full sm:w-64 md:w-72 lg:w-80">
                 <input
                   type="text"
                   placeholder="Search photos by title"
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full py-2 px-6 text-gray-100 bg-transparent leading-tight focus:outline-none"
+                  className="w-full py-2 px-6 text-gray-100 bg-transparent placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-teal-500 rounded-full transition-all duration-300"
                 />
                 {searchTerm && (
                   <button
                     onClick={() => setSearchTerm("")}
-                    className="absolute right-12 text-gray-400 hover:text-gray-100"
+                    className="absolute right-12 text-gray-400 hover:text-gray-100 transition-colors duration-200"
                   >
                     <svg
                       className="w-5 h-5"
@@ -127,7 +118,7 @@ function App() {
                   </button>
                 )}
                 <div className="p-2">
-                  <button className="bg-gradient-to-r from-blue-500 to-indigo-500 text-white rounded-full p-2 hover:from-blue-600 hover:to-indigo-600 focus:outline-none w-12 h-12 flex items-center justify-center transition-all duration-300">
+                  <button className="bg-teal-500 text-white rounded-full p-2 hover:bg-teal-600 focus:outline-none focus:ring-2 focus:ring-teal-400 w-12 h-12 flex items-center justify-center transition-all duration-300">
                     <svg
                       className="w-5 h-5"
                       fill="none"
@@ -145,13 +136,12 @@ function App() {
                   </button>
                 </div>
               </div>
-              {/* Navigation Links */}
               <nav className="flex items-center mt-2 sm:mt-0">
                 <a
                   href="https://github.com/example-user/PhotoGalleryNew"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-gray-400 hover:text-gray-100"
+                  className="text-teal-400 hover:text-teal-300 transition-colors duration-200"
                 >
                   GitHub
                 </a>
@@ -167,14 +157,14 @@ function App() {
           </Routes>
         </main>
         {/* Footer */}
-        <footer className="bg-gradient-to-r from-gray-800 to-gray-900 py-4 w-full border-t border-gray-700">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-gray-300">
+        <footer className="bg-gray-900 py-6 w-full border-t border-gray-700">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-gray-400">
             <p>© 2025 Photo Gallery App. All rights reserved.</p>
             <a
               href="https://github.com/example-user/PhotoGalleryNew"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-gray-300 hover:text-gray-100"
+              className="text-teal-400 hover:text-teal-300 transition-colors duration-200"
             >
               GitHub Portfolio
             </a>
