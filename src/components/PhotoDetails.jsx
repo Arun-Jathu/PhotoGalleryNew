@@ -5,11 +5,14 @@ import { motion } from "framer-motion";
 import { fetchPhotos } from "../features/photosSlice.js";
 
 // PhotoDetails component: Displays detailed info for a single photo
-function PhotoDetails() {
+function PhotoDetails({ uploadedPhotos }) {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { id } = useParams();
   const { photos, loading, error } = useSelector((state) => state.photos);
+
+  // Combine photos and uploadedPhotos for lookup
+  const allPhotos = [...photos, ...uploadedPhotos];
 
   // State for description editing
   const [description, setDescription] = useState("");
@@ -18,24 +21,34 @@ function PhotoDetails() {
 
   // Fetch photos and load description from localStorage on mount
   useEffect(() => {
+    // Fetch photos if not already loaded
     if (photos.length === 0) {
-      dispatch(fetchPhotos());
+      dispatch(fetchPhotos("random")); // Use a default query to ensure data
     }
 
-    const savedDescription = localStorage.getItem(`photo-description-${id}`);
-    if (savedDescription) {
-      setDescription(savedDescription);
+    // Find the photo and set its description
+    const photo = allPhotos.find((p) => p.id === id || p.id === parseInt(id));
+    if (photo) {
+      const savedDescription = localStorage.getItem(`photo-description-${id}`);
+      setDescription(
+        savedDescription || photo.description || "No description available"
+      );
     }
-  }, [dispatch, photos.length, id]);
+  }, [dispatch, allPhotos, id]);
 
   // Find the current photo and related photos
-  const photo = photos.find((p) => p.id === parseInt(id));
-  const currentIndex = photos.findIndex((p) => p.id === parseInt(id));
-  const prevPhotoId = currentIndex > 0 ? photos[currentIndex - 1].id : null;
+  const photo = allPhotos.find((p) => p.id === id || p.id === parseInt(id));
+  const currentIndex = allPhotos.findIndex(
+    (p) => p.id === id || p.id === parseInt(id)
+  );
+  const prevPhotoId = currentIndex > 0 ? allPhotos[currentIndex - 1].id : null;
   const nextPhotoId =
-    currentIndex < photos.length - 1 ? photos[currentIndex + 1].id : null;
-  const relatedPhotos = photos
-    .filter((p) => p.albumId === (photo?.albumId || 0) && p.id !== parseInt(id))
+    currentIndex < allPhotos.length - 1 ? allPhotos[currentIndex + 1].id : null;
+  const relatedPhotos = allPhotos
+    .filter(
+      (p) =>
+        p.albumId === (photo?.albumId || 0) && p.id !== (id || parseInt(id))
+    )
     .slice(0, 3); // Get up to 3 related photos from the same album
 
   // Navigate to the next photo when clicking the image
@@ -96,7 +109,7 @@ function PhotoDetails() {
       <div className="text-center p-6 bg-red-100 text-red-700 rounded-lg">
         {error}
         <button
-          onClick={() => dispatch(fetchPhotos())}
+          onClick={() => dispatch(fetchPhotos("random"))}
           className="ml-4 bg-teal-500 text-white px-6 py-2 rounded-full hover:bg-teal-600 transition-all duration-300"
         >
           Retry
@@ -108,7 +121,10 @@ function PhotoDetails() {
   if (!photo)
     return (
       <div className="text-center text-gray-400 text-lg py-12">
-        Photo not found
+        Photo not found.{" "}
+        <Link to="/" className="text-teal-400 hover:text-teal-300">
+          Back to Gallery
+        </Link>
       </div>
     );
 
@@ -117,8 +133,8 @@ function PhotoDetails() {
       {/* Hero Section with Photo */}
       <div className="relative w-full h-[50vh] sm:h-[60vh] lg:h-[70vh] flex items-center justify-center overflow-hidden">
         <img
-          src={photo.url}
-          alt={photo.title}
+          src={photo.urls.regular || "https://picsum.photos/600"}
+          alt={photo.description || photo.title || "Photo"}
           loading="lazy"
           className="w-full h-full object-contain"
           onError={(e) => (e.target.src = "https://picsum.photos/600")}
@@ -127,7 +143,7 @@ function PhotoDetails() {
         {/* Overlay for Title and Metadata */}
         <div className="absolute inset-0 bg-gradient-to-t from-gray-900/80 to-transparent flex flex-col justify-end p-6 sm:p-8 lg:p-12">
           <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white mb-4">
-            {photo.title}
+            {photo.title || photo.description || "Untitled"}
           </h1>
           <div className="flex space-x-4 text-gray-300 text-base sm:text-lg">
             <p>Photo ID: {photo.id}</p>
@@ -203,8 +219,14 @@ function PhotoDetails() {
                   <article className="overflow-hidden rounded-xl shadow-lg bg-gray-900 border border-gray-700/50 transform hover:scale-105 transition-transform duration-300">
                     <Link to={`/photo/${relatedPhoto.id}`}>
                       <img
-                        src={relatedPhoto.thumbnailUrl}
-                        alt={relatedPhoto.title}
+                        src={
+                          relatedPhoto.urls.small || "https://picsum.photos/150"
+                        }
+                        alt={
+                          relatedPhoto.description ||
+                          relatedPhoto.title ||
+                          "Related Photo"
+                        }
                         loading="lazy"
                         className="block h-40 w-full object-contain bg-gray-800"
                         onError={(e) =>
@@ -213,7 +235,9 @@ function PhotoDetails() {
                       />
                       <div className="p-4 flex flex-col h-32">
                         <h3 className="text-base font-medium text-gray-200 line-clamp-2 mb-2">
-                          {relatedPhoto.title}
+                          {relatedPhoto.title ||
+                            relatedPhoto.description ||
+                            "Untitled"}
                         </h3>
                         <p className="text-gray-400 text-sm">
                           Photo #{relatedPhoto.id}
@@ -367,7 +391,9 @@ function PhotoDetails() {
                   Back to Gallery
                 </Link>
                 <button
-                  onClick={() => handleDownload(photo.url, photo.title)}
+                  onClick={() =>
+                    handleDownload(photo.urls.regular, photo.title || photo.id)
+                  }
                   className="inline-flex items-center justify-center bg-gray-700 text-gray-100 px-6 py-3 rounded-full font-medium hover:bg-gray-600 transition-all duration-300 transform hover:scale-105 focus:ring-2 focus:ring-teal-400 focus:outline-none"
                 >
                   <svg
