@@ -16,6 +16,10 @@ function App() {
     const savedPhotos = localStorage.getItem("uploadedPhotos");
     return savedPhotos ? JSON.parse(savedPhotos) : [];
   });
+  const [isNightMode, setIsNightMode] = useState(() => {
+    const savedMode = localStorage.getItem("nightMode");
+    return savedMode ? JSON.parse(savedMode) : true; // Default to night mode
+  });
 
   useEffect(() => {
     const handleResize = () => {
@@ -36,13 +40,30 @@ function App() {
     }
   };
 
+  const toggleNightMode = () => {
+    setIsNightMode(!isNightMode);
+    localStorage.setItem("nightMode", !isNightMode);
+  };
+
   return (
     <Provider store={store}>
-      <div className="min-h-screen bg-gradient-to-b from-gray-800 to-gray-900 text-gray-100 flex flex-col font-sans">
+      <div
+        className={`min-h-screen flex flex-col font-sans ${
+          isNightMode
+            ? "bg-gray-900 text-gray-100"
+            : "bg-gradient-to-b from-gray-50 to-gray-100 text-gray-900"
+        }`}
+      >
         {/* Header */}
-        <header className="bg-gray-900 w-full sticky top-0 z-10 border-b border-gray-700">
+        <header
+          className={`w-full sticky top-0 z-10 border-b ${
+            isNightMode
+              ? "bg-gray-900 border-gray-800"
+              : "bg-gray-100 border-gray-200"
+          }`}
+        >
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
-            <div className="flex items-center space-x-2">
+            <div className="flex items-center space-x-4">
               <h1 className="text-xl font-medium text-teal-400 flex items-center hover:text-teal-300 transition-colors duration-200">
                 <svg
                   className="w-6 h-6 mr-1"
@@ -62,6 +83,28 @@ function App() {
                   Photo Gallery
                 </Link>
               </h1>
+              <div className="flex items-center space-x-2">
+                <label className="relative inline-flex items-center cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={isNightMode}
+                    onChange={toggleNightMode}
+                    className="sr-only peer"
+                  />
+                  <div
+                    className={`w-11 h-6 ${
+                      isNightMode ? "bg-teal-600" : "bg-teal-200"
+                    } peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-teal-400 rounded-full peer peer-checked:bg-teal-600 after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-teal-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all ${
+                      isNightMode
+                        ? "peer-checked:after:translate-x-5"
+                        : "after:translate-x-0"
+                    }`}
+                  ></div>
+                  <span className="ml-2 text-teal-400">
+                    {isNightMode ? "🌙" : "🌞"}
+                  </span>
+                </label>
+              </div>
             </div>
             <div className="flex items-center space-x-6">
               <button
@@ -88,19 +131,32 @@ function App() {
                   isHeaderExpanded ? "" : "hidden"
                 } sm:flex items-center space-x-6`}
               >
-                <div className="relative flex items-center border border-gray-600 bg-gray-700 rounded-full px-4 py-2 w-full sm:w-72">
+                <div
+                  className={`relative flex items-center ${
+                    isNightMode
+                      ? "border-teal-600 bg-teal-800"
+                      : "border-teal-200 bg-teal-100"
+                  } rounded-full px-4 py-2 w-full sm:w-72`}
+                >
                   <input
                     type="text"
                     placeholder="Search photos by title"
                     value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className="w-full py-1 px-2 text-gray-100 bg-transparent placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-teal-500 rounded-full text-sm"
+                    onChange={(e) => {
+                      console.log("Search term changed to:", e.target.value);
+                      setSearchTerm(e.target.value);
+                    }}
+                    className={`w-full py-1 px-2 ${
+                      isNightMode
+                        ? "text-gray-100 bg-transparent placeholder-teal-400"
+                        : "text-gray-900 bg-transparent placeholder-teal-600"
+                    } focus:outline-none focus:ring-2 focus:ring-teal-500 rounded-full text-sm`}
                     onClick={closeHeader}
                   />
                   {searchTerm && (
                     <button
                       onClick={() => setSearchTerm("")}
-                      className="absolute right-10 text-gray-400 hover:text-gray-100 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-teal-400 rounded"
+                      className="absolute right-10 text-teal-400 hover:text-teal-300 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-teal-400 rounded"
                     >
                       <svg
                         className="w-4 h-4"
@@ -149,7 +205,13 @@ function App() {
           </div>
           {/* Mobile Dropdown Menu */}
           {!window.innerWidth >= 640 && isHeaderExpanded && (
-            <div className="sm:hidden absolute top-16 left-0 w-full bg-gray-800 bg-opacity-95 rounded-lg p-4 shadow-lg z-20">
+            <div
+              className={`sm:hidden absolute top-16 left-0 w-full ${
+                isNightMode
+                  ? "bg-gray-900 bg-opacity-95"
+                  : "bg-white bg-opacity-95"
+              } rounded-lg p-4 shadow-lg z-20`}
+            >
               <div className="flex flex-col items-center space-y-4">
                 <button
                   className="absolute top-2 right-2 text-white text-xl focus:outline-none"
@@ -158,18 +220,29 @@ function App() {
                   ×
                 </button>
                 <div className="w-full max-w-md">
-                  <div className="relative flex items-center bg-gray-700 rounded-full px-4 py-2">
+                  <div
+                    className={`relative flex items-center ${
+                      isNightMode ? "bg-teal-800" : "bg-teal-100"
+                    } rounded-full px-4 py-2`}
+                  >
                     <input
                       type="text"
                       placeholder="Search photos by title"
                       value={searchTerm}
-                      onChange={(e) => setSearchTerm(e.target.value)}
-                      className="w-full py-1 px-2 text-gray-100 bg-transparent placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-teal-500 rounded-full text-sm"
+                      onChange={(e) => {
+                        console.log("Search term changed to:", e.target.value);
+                        setSearchTerm(e.target.value);
+                      }}
+                      className={`w-full py-1 px-2 ${
+                        isNightMode
+                          ? "text-gray-100 bg-transparent placeholder-teal-400"
+                          : "text-gray-900 bg-transparent placeholder-teal-600"
+                      } focus:outline-none focus:ring-2 focus:ring-teal-500 rounded-full text-sm`}
                     />
                     {searchTerm && (
                       <button
                         onClick={() => setSearchTerm("")}
-                        className="absolute right-12 text-gray-400 hover:text-gray-100 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-teal-400 rounded"
+                        className="absolute right-12 text-teal-400 hover:text-teal-300 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-teal-400 rounded"
                       >
                         <svg
                           className="w-4 h-4"
@@ -209,7 +282,9 @@ function App() {
                   href="https://github.com/example-user/PhotoGalleryNew"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-teal-400 hover:text-teal-300 text-sm transition-colors duration-200 px-4 py-2 rounded-full bg-gray-700 w-full max-w-md text-center"
+                  className={`text-teal-400 hover:text-teal-300 text-sm transition-colors duration-200 px-4 py-2 rounded-full ${
+                    isNightMode ? "bg-teal-800" : "bg-teal-100"
+                  } w-full max-w-md text-center`}
                 >
                   GitHub
                 </a>
@@ -227,18 +302,30 @@ function App() {
                 <Gallery
                   searchTerm={searchTerm}
                   setUploadedPhotos={setUploadedPhotos}
+                  isNightMode={isNightMode}
                 />
               }
             />
             <Route
               path="/photo/:id"
-              element={<PhotoDetails uploadedPhotos={uploadedPhotos} />}
+              element={
+                <PhotoDetails
+                  uploadedPhotos={uploadedPhotos}
+                  isNightMode={isNightMode}
+                />
+              }
             />
           </Routes>
         </main>
         {/* Footer */}
-        <footer className="bg-gray-900 py-6 w-full border-t border-gray-700">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-gray-400">
+        <footer
+          className={`mt-12 py-6 w-full border-t ${
+            isNightMode
+              ? "bg-gray-900 border-gray-800 text-gray-400"
+              : "bg-gray-100 border-gray-200 text-gray-600"
+          }`}
+        >
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
             <p>© 2025 Photo Gallery App. All rights reserved.</p>
             <a
               href="https://github.com/example-user/PhotoGalleryNew"

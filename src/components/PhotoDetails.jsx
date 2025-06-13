@@ -5,7 +5,7 @@ import { motion } from "framer-motion";
 import { fetchPhotos } from "../features/photosSlice.js";
 
 // PhotoDetails component: Displays detailed info for a single photo
-function PhotoDetails({ uploadedPhotos }) {
+function PhotoDetails({ uploadedPhotos, isNightMode }) {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { id } = useParams();
@@ -97,16 +97,24 @@ function PhotoDetails({ uploadedPhotos }) {
   // Show loading spinner while fetching photos
   if (loading)
     return (
-      <div className="text-center py-12">
+      <div
+        className={`text-center py-12 ${
+          isNightMode ? "text-gray-400" : "text-gray-600"
+        }`}
+      >
         <div className="w-8 h-8 border-4 border-teal-500 border-t-transparent rounded-full animate-spin mx-auto"></div>
-        <p className="mt-4 text-gray-400 text-lg">Loading photo...</p>
+        <p className="mt-4 text-lg">Loading photo...</p>
       </div>
     );
 
   // Show error message if fetch fails
   if (error)
     return (
-      <div className="text-center p-6 bg-red-100 text-red-700 rounded-lg">
+      <div
+        className={`text-center p-6 rounded-lg ${
+          isNightMode ? "bg-red-900/50 text-red-400" : "bg-red-100 text-red-700"
+        }`}
+      >
         {error}
         <button
           onClick={() => dispatch(fetchPhotos("random"))}
@@ -120,16 +128,33 @@ function PhotoDetails({ uploadedPhotos }) {
   // Show message if photo is not found
   if (!photo)
     return (
-      <div className="text-center text-gray-400 text-lg py-12">
+      <div
+        className={`text-center text-lg py-12 ${
+          isNightMode ? "text-gray-400" : "text-gray-500"
+        }`}
+      >
         Photo not found.{" "}
-        <Link to="/" className="text-teal-400 hover:text-teal-300">
+        <Link
+          to="/"
+          className={`hover:underline ${
+            isNightMode
+              ? "text-teal-400 hover:text-teal-300"
+              : "text-teal-600 hover:text-teal-500"
+          }`}
+        >
           Back to Gallery
         </Link>
       </div>
     );
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-800 to-gray-900 text-gray-100">
+    <div
+      className={`min-h-screen ${
+        isNightMode
+          ? "bg-gradient-to-b from-gray-800 to-gray-900 text-gray-100"
+          : "bg-gradient-to-b from-gray-50 to-gray-100 text-gray-900"
+      }`}
+    >
       {/* Hero Section with Photo */}
       <div className="relative w-full h-[50vh] sm:h-[60vh] lg:h-[70vh] flex items-center justify-center overflow-hidden">
         <img
@@ -141,11 +166,25 @@ function PhotoDetails({ uploadedPhotos }) {
           onClick={handleImageClick}
         />
         {/* Overlay for Title and Metadata */}
-        <div className="absolute inset-0 bg-gradient-to-t from-gray-900/80 to-transparent flex flex-col justify-end p-6 sm:p-8 lg:p-12">
-          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white mb-4">
+        <div
+          className={`absolute inset-0 ${
+            isNightMode
+              ? "bg-gradient-to-t from-gray-900/80 to-transparent"
+              : "bg-gradient-to-t from-gray-200/80 to-transparent"
+          } flex flex-col justify-end p-6 sm:p-8 lg:p-12`}
+        >
+          <h1
+            className={`text-2xl sm:text-3xl lg:text-4xl font-bold ${
+              isNightMode ? "text-white" : "text-gray-900"
+            } mb-4`}
+          >
             {photo.title || photo.description || "Untitled"}
           </h1>
-          <div className="flex space-x-4 text-gray-300 text-base sm:text-lg">
+          <div
+            className={`flex space-x-4 text-base sm:text-lg ${
+              isNightMode ? "text-gray-300" : "text-gray-600"
+            }`}
+          >
             <p>Photo ID: {photo.id}</p>
             <p>Album ID: {photo.albumId}</p>
           </div>
@@ -204,7 +243,11 @@ function PhotoDetails({ uploadedPhotos }) {
         {/* Related Photos Section */}
         {relatedPhotos.length > 0 && (
           <div className="mt-12">
-            <h2 className="text-2xl font-semibold text-gray-100 mb-6">
+            <h2
+              className={`text-2xl font-semibold ${
+                isNightMode ? "text-gray-100" : "text-gray-800"
+              } mb-6`}
+            >
               More from Album {photo.albumId}
             </h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -216,7 +259,13 @@ function PhotoDetails({ uploadedPhotos }) {
                   transition={{ duration: 0.3 }}
                   className="relative"
                 >
-                  <article className="overflow-hidden rounded-xl shadow-lg bg-gray-900 border border-gray-700/50 transform hover:scale-105 transition-transform duration-300">
+                  <article
+                    className={`overflow-hidden rounded-xl shadow-lg border transform hover:scale-105 transition-transform duration-300 ${
+                      isNightMode
+                        ? "bg-gray-900 border-gray-700/50"
+                        : "bg-white border-gray-200"
+                    }`}
+                  >
                     <Link to={`/photo/${relatedPhoto.id}`}>
                       <img
                         src={
@@ -233,13 +282,25 @@ function PhotoDetails({ uploadedPhotos }) {
                           (e.target.src = "https://picsum.photos/150")
                         }
                       />
-                      <div className="p-4 flex flex-col h-32">
-                        <h3 className="text-base font-medium text-gray-200 line-clamp-2 mb-2">
+                      <div
+                        className={`p-4 flex flex-col h-32 ${
+                          isNightMode ? "bg-gray-800" : "bg-white"
+                        }`}
+                      >
+                        <h3
+                          className={`text-base font-medium line-clamp-2 mb-2 ${
+                            isNightMode ? "text-gray-200" : "text-gray-800"
+                          }`}
+                        >
                           {relatedPhoto.title ||
                             relatedPhoto.description ||
                             "Untitled"}
                         </h3>
-                        <p className="text-gray-400 text-sm">
+                        <p
+                          className={`text-sm ${
+                            isNightMode ? "text-gray-400" : "text-gray-500"
+                          }`}
+                        >
                           Photo #{relatedPhoto.id}
                         </p>
                       </div>
@@ -255,12 +316,49 @@ function PhotoDetails({ uploadedPhotos }) {
         <div className="flex flex-col lg:flex-row lg:space-x-8 mt-12">
           {/* Main Details */}
           <div className="lg:w-2/3">
-            <div className="bg-gray-900/50 backdrop-blur-md rounded-xl p-6 shadow-lg border border-gray-700/50">
-              <h2 className="text-2xl font-semibold text-gray-100 mb-4">
+            <div
+              className={`bg-${
+                isNightMode ? "gray-900/50" : "white"
+              } backdrop-blur-md rounded-xl p-6 shadow-lg border ${
+                isNightMode ? "border-gray-700/50" : "border-gray-200"
+              } relative`}
+            >
+              <button
+                onClick={handleEditDescription}
+                className={`absolute top-4 right-4 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-teal-400 rounded ${
+                  isNightMode
+                    ? "text-teal-400 hover:text-teal-300"
+                    : "text-teal-600 hover:text-teal-500"
+                }`}
+              >
+                <svg
+                  className="w-5 h-5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7 M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"
+                  />
+                </svg>
+              </button>
+              <h2
+                className={`text-2xl font-semibold ${
+                  isNightMode ? "text-gray-100" : "text-gray-900"
+                } mb-4`}
+              >
                 About This Photo
               </h2>
               <div className="space-y-4">
-                <div className="flex items-center text-gray-300">
+                <div
+                  className={`flex items-center ${
+                    isNightMode ? "text-gray-300" : "text-gray-600"
+                  }`}
+                >
                   <svg
                     className="w-5 h-5 mr-2 text-teal-400"
                     fill="none"
@@ -279,7 +377,11 @@ function PhotoDetails({ uploadedPhotos }) {
                     Photo #{photo.id} from Album #{photo.albumId}
                   </p>
                 </div>
-                <div className="flex items-center text-gray-300">
+                <div
+                  className={`flex items-center ${
+                    isNightMode ? "text-gray-300" : "text-gray-600"
+                  }`}
+                >
                   <svg
                     className="w-5 h-5 mr-2 text-teal-400"
                     fill="none"
@@ -296,7 +398,11 @@ function PhotoDetails({ uploadedPhotos }) {
                   </svg>
                   <p>Date Taken: Unknown</p>
                 </div>
-                <div className="flex items-start text-gray-300">
+                <div
+                  className={`flex items-start ${
+                    isNightMode ? "text-gray-300" : "text-gray-600"
+                  }`}
+                >
                   <svg
                     className="w-5 h-5 mr-2 text-teal-400"
                     fill="none"
@@ -319,7 +425,11 @@ function PhotoDetails({ uploadedPhotos }) {
                           value={tempDescription}
                           onChange={(e) => setTempDescription(e.target.value)}
                           placeholder="Enter a description for this photo..."
-                          className="w-full p-3 rounded-lg bg-gray-700 text-gray-100 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-teal-500 transition-all duration-300"
+                          className={`w-full p-3 rounded-lg border focus:outline-none focus:ring-2 focus:ring-teal-500 transition-all duration-300 ${
+                            isNightMode
+                              ? "bg-gray-700 text-gray-100 border-gray-600"
+                              : "bg-white text-gray-900 border-gray-300"
+                          }`}
                           rows="4"
                         />
                         <div className="flex space-x-3">
@@ -331,7 +441,11 @@ function PhotoDetails({ uploadedPhotos }) {
                           </button>
                           <button
                             onClick={handleCancelEdit}
-                            className="bg-gray-600 text-gray-100 px-4 py-2 rounded-full font-medium hover:bg-gray-500 transition-all duration-300 transform hover:scale-105 focus:ring-2 focus:ring-teal-400 focus:outline-none"
+                            className={`px-4 py-2 rounded-full font-medium transition-all duration-300 transform hover:scale-105 focus:ring-2 focus:ring-teal-400 focus:outline-none ${
+                              isNightMode
+                                ? "bg-gray-600 text-gray-100 hover:bg-gray-500"
+                                : "bg-gray-300 text-gray-700 hover:bg-gray-400"
+                            }`}
                           >
                             Cancel
                           </button>
@@ -339,20 +453,24 @@ function PhotoDetails({ uploadedPhotos }) {
                       </div>
                     ) : description ? (
                       <div>
-                        <p className="mb-2">{description}</p>
-                        <button
-                          onClick={handleEditDescription}
-                          className="text-teal-400 hover:text-teal-300 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-teal-400 rounded"
+                        <p
+                          className={`mb-2 ${
+                            isNightMode ? "text-gray-100" : "text-gray-800"
+                          }`}
                         >
-                          Edit
-                        </button>
+                          {description}
+                        </p>
                       </div>
                     ) : (
                       <p>
                         No description available.{" "}
                         <button
                           onClick={handleEditDescription}
-                          className="text-teal-400 hover:text-teal-300 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-teal-400 rounded"
+                          className={`transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-teal-400 rounded ${
+                            isNightMode
+                              ? "text-teal-400 hover:text-teal-300"
+                              : "text-teal-600 hover:text-teal-500"
+                          }`}
                         >
                           Add one?
                         </button>
@@ -365,8 +483,18 @@ function PhotoDetails({ uploadedPhotos }) {
           </div>
           {/* Sidebar with Actions */}
           <div className="lg:w-1/3 mt-8 lg:mt-0">
-            <div className="bg-gray-900/50 backdrop-blur-md rounded-xl p-6 shadow-lg border border-gray-700/50">
-              <h2 className="text-xl font-semibold text-gray-100 mb-4">
+            <div
+              className={`bg-${
+                isNightMode ? "gray-900/50" : "white"
+              } backdrop-blur-md rounded-xl p-6 shadow-lg border ${
+                isNightMode ? "border-gray-700/50" : "border-gray-200"
+              }`}
+            >
+              <h2
+                className={`text-xl font-semibold ${
+                  isNightMode ? "text-gray-100" : "text-gray-900"
+                } mb-4`}
+              >
                 Actions
               </h2>
               <div className="flex flex-col space-y-4">
@@ -394,7 +522,11 @@ function PhotoDetails({ uploadedPhotos }) {
                   onClick={() =>
                     handleDownload(photo.urls.regular, photo.title || photo.id)
                   }
-                  className="inline-flex items-center justify-center bg-gray-700 text-gray-100 px-6 py-3 rounded-full font-medium hover:bg-gray-600 transition-all duration-300 transform hover:scale-105 focus:ring-2 focus:ring-teal-400 focus:outline-none"
+                  className={`inline-flex items-center justify-center px-6 py-3 rounded-full font-medium transition-all duration-300 transform hover:scale-105 focus:ring-2 focus:ring-teal-400 focus:outline-none ${
+                    isNightMode
+                      ? "bg-gray-700 text-gray-100 hover:bg-gray-600"
+                      : "bg-gray-300 text-gray-700 hover:bg-gray-400"
+                  }`}
                 >
                   <svg
                     className="w-5 h-5 mr-2"

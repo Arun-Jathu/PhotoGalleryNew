@@ -6,7 +6,11 @@ import { motion } from "framer-motion";
 import imageCompression from "browser-image-compression";
 
 // Gallery component: Displays a paginated grid of photos with upload and lightbox features
-function Gallery({ searchTerm: propSearchTerm = "", setUploadedPhotos }) {
+function Gallery({
+  searchTerm: propSearchTerm = "",
+  setUploadedPhotos,
+  isNightMode,
+}) {
   const dispatch = useDispatch();
   const { photos, loading, error } = useSelector((state) => state.photos);
   const [currentPage, setCurrentPage] = useState(1);
@@ -158,15 +162,23 @@ function Gallery({ searchTerm: propSearchTerm = "", setUploadedPhotos }) {
 
   if (loading)
     return (
-      <div className="text-center py-12">
+      <div
+        className={`text-center py-12 ${
+          isNightMode ? "text-gray-400" : "text-gray-600"
+        }`}
+      >
         <div className="w-8 h-8 border-4 border-teal-500 border-t-transparent rounded-full animate-spin mx-auto"></div>
-        <p className="mt-4 text-gray-400 text-lg">Loading photos...</p>
+        <p className="mt-4 text-lg">Loading photos...</p>
       </div>
     );
 
   if (error)
     return (
-      <div className="text-center p-6 bg-red-100 text-red-700 rounded-lg">
+      <div
+        className={`text-center p-6 rounded-lg ${
+          isNightMode ? "bg-red-900/50 text-red-400" : "bg-red-100 text-red-700"
+        }`}
+      >
         {error}
         <button
           onClick={() => dispatch(fetchPhotos(localSearchTerm || "random"))}
@@ -178,11 +190,21 @@ function Gallery({ searchTerm: propSearchTerm = "", setUploadedPhotos }) {
     );
 
   return (
-    <div className="mt-4 w-full">
+    <div
+      className={`mt-4 w-full ${
+        isNightMode
+          ? "bg-gray-900"
+          : "bg-gradient-to-b from-gray-50 to-gray-100"
+      }`}
+    >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="mb-6">
           <div
-            className="border-2 border-dashed border-teal-500 rounded-lg p-4 text-center bg-gray-800 hover:bg-gray-700 transition-all duration-300 flex items-center justify-center h-20"
+            className={`border-2 border-dashed border-teal-500 rounded-lg p-4 text-center flex items-center justify-center h-20 ${
+              isNightMode
+                ? "bg-gray-800 hover:bg-gray-700 text-gray-300"
+                : "bg-white hover:bg-gray-100 text-gray-600"
+            } transition-all duration-300`}
             onDragOver={(e) => e.preventDefault()}
             onDrop={(e) => {
               e.preventDefault();
@@ -208,9 +230,7 @@ function Gallery({ searchTerm: propSearchTerm = "", setUploadedPhotos }) {
                 d="M12 6v6m0 0v6m0-6h6m-6 0H6"
               />
             </svg>
-            <span className="text-gray-300 text-sm">
-              Drag and drop or click to select
-            </span>
+            <span className="text-sm">Drag and drop or click to select</span>
             <input
               type="file"
               id="photoUpload"
@@ -224,14 +244,20 @@ function Gallery({ searchTerm: propSearchTerm = "", setUploadedPhotos }) {
               }}
             />
             {selectedFile && (
-              <p className="mt-2 text-teal-400 text-sm absolute left-4 bottom-2">
+              <p
+                className={`mt-2 text-sm absolute left-4 bottom-2 ${
+                  isNightMode ? "text-teal-400" : "text-teal-600"
+                }`}
+              >
                 {selectedFile.name}
               </p>
             )}
           </div>
           <button
             onClick={handleUpload}
-            className="mt-2 w-full bg-teal-500 text-white py-1.5 rounded-lg hover:bg-teal-600 transition-all duration-300 disabled:bg-gray-500 disabled:cursor-not-allowed text-sm"
+            className={`mt-2 w-full py-1.5 rounded-lg hover:bg-teal-600 transition-all duration-300 disabled:bg-gray-500 disabled:cursor-not-allowed text-sm ${
+              isNightMode ? "bg-teal-500 text-white" : "bg-teal-500 text-white"
+            }`}
             disabled={!selectedFile}
           >
             Upload
@@ -239,7 +265,11 @@ function Gallery({ searchTerm: propSearchTerm = "", setUploadedPhotos }) {
         </div>
 
         {currentPhotos.length === 0 ? (
-          <div className="text-center text-gray-400 text-lg py-12">
+          <div
+            className={`text-center text-lg py-12 ${
+              isNightMode ? "text-gray-400" : "text-gray-500"
+            }`}
+          >
             No photos found
           </div>
         ) : (
@@ -257,7 +287,13 @@ function Gallery({ searchTerm: propSearchTerm = "", setUploadedPhotos }) {
                 transition={{ duration: 0.3 }}
                 className="relative"
               >
-                <article className="overflow-hidden rounded-xl shadow-lg bg-gray-900 border border-gray-700/50 transform hover:scale-105 transition-transform duration-300">
+                <article
+                  className={`overflow-hidden rounded-xl shadow-lg border transform hover:scale-105 transition-transform duration-300 ${
+                    isNightMode
+                      ? "bg-gray-800 border-gray-700/50"
+                      : "bg-white border-gray-200"
+                  }`}
+                >
                   <div
                     onClick={() => openLightbox(photo)}
                     className="cursor-pointer"
@@ -279,12 +315,20 @@ function Gallery({ searchTerm: propSearchTerm = "", setUploadedPhotos }) {
                     />
                   </div>
                   <div className="p-4 flex flex-col">
-                    <h3 className="text-base font-medium text-gray-200 line-clamp-2 mb-2">
+                    <h3
+                      className={`text-base font-medium line-clamp-2 mb-2 ${
+                        isNightMode ? "text-gray-200" : "text-gray-800"
+                      }`}
+                    >
                       <span title={photo.description ?? "Untitled"}>
                         {photo.description ?? "Untitled"}
                       </span>
                     </h3>
-                    <p className="text-gray-400 text-sm mb-2">
+                    <p
+                      className={`text-sm mb-2 ${
+                        isNightMode ? "text-gray-400" : "text-gray-500"
+                      }`}
+                    >
                       Photo #{photo.id}
                     </p>
                     {editingPhotoId === photo.id ? (
@@ -293,7 +337,11 @@ function Gallery({ searchTerm: propSearchTerm = "", setUploadedPhotos }) {
                           value={tempDescription}
                           onChange={(e) => setTempDescription(e.target.value)}
                           placeholder="Enter a description..."
-                          className="w-full p-3 rounded-lg bg-gray-700 text-gray-100 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-teal-500 transition-all duration-300"
+                          className={`w-full p-3 rounded-lg border focus:outline-none focus:ring-2 focus:ring-teal-500 transition-all duration-300 ${
+                            isNightMode
+                              ? "bg-gray-700 text-gray-100 border-gray-600"
+                              : "bg-white text-gray-900 border-gray-300"
+                          }`}
                           rows="3"
                         />
                         <div className="flex space-x-3">
@@ -305,7 +353,11 @@ function Gallery({ searchTerm: propSearchTerm = "", setUploadedPhotos }) {
                           </button>
                           <button
                             onClick={handleCancelEdit}
-                            className="bg-gray-600 text-gray-100 px-4 py-2 rounded-full font-medium hover:bg-gray-500 transition-all duration-300"
+                            className={`px-4 py-2 rounded-full font-medium transition-all duration-300 ${
+                              isNightMode
+                                ? "bg-gray-600 text-gray-100 hover:bg-gray-500"
+                                : "bg-gray-300 text-gray-700 hover:bg-gray-400"
+                            }`}
                           >
                             Cancel
                           </button>
@@ -316,13 +368,21 @@ function Gallery({ searchTerm: propSearchTerm = "", setUploadedPhotos }) {
                         {localStorage.getItem(
                           `photo-description-${photo.id}`
                         ) ? (
-                          <p className="text-gray-300 text-sm line-clamp-2">
+                          <p
+                            className={`text-sm line-clamp-2 ${
+                              isNightMode ? "text-gray-300" : "text-gray-600"
+                            }`}
+                          >
                             {localStorage.getItem(
                               `photo-description-${photo.id}`
                             )}
                           </p>
                         ) : (
-                          <p className="text-gray-400 text-sm italic">
+                          <p
+                            className={`text-sm italic ${
+                              isNightMode ? "text-gray-400" : "text-gray-500"
+                            }`}
+                          >
                             No description available.
                           </p>
                         )}
@@ -335,7 +395,11 @@ function Gallery({ searchTerm: propSearchTerm = "", setUploadedPhotos }) {
                               )
                             )
                           }
-                          className="text-teal-400 hover:text-teal-300 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-teal-400 rounded text-sm"
+                          className={`transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-teal-400 rounded text-sm ${
+                            isNightMode
+                              ? "text-teal-400 hover:text-teal-300"
+                              : "text-teal-600 hover:text-teal-500"
+                          }`}
                         >
                           {localStorage.getItem(`photo-description-${photo.id}`)
                             ? "Edit Description"
@@ -358,14 +422,22 @@ function Gallery({ searchTerm: propSearchTerm = "", setUploadedPhotos }) {
           </motion.div>
         )}
         {filteredPhotos.length > 0 && (
-          <div className="mt-12 flex justify-center items-center space-x-3">
+          <div
+            className={`mt-12 flex justify-center items-center space-x-3 ${
+              isNightMode ? "text-gray-200" : "text-gray-600"
+            }`}
+          >
             <button
               onClick={handleFirstPage}
               disabled={currentPage === 1}
-              className={`px-4 py-2 rounded-full font-medium text-white text-sm sm:text-base min-w-[80px] ${
+              className={`px-4 py-2 rounded-full font-medium text-sm sm:text-base min-w-[80px] ${
                 currentPage === 1
                   ? "bg-gray-600 cursor-not-allowed opacity-50"
-                  : "bg-teal-500 hover:bg-teal-600 transform hover:scale-105"
+                  : `${
+                      isNightMode
+                        ? "bg-teal-500 hover:bg-teal-600"
+                        : "bg-teal-500 hover:bg-teal-600"
+                    } transform hover:scale-105`
               } transition-all duration-300 focus:ring-2 focus:ring-teal-400 focus:outline-none`}
             >
               First
@@ -373,10 +445,14 @@ function Gallery({ searchTerm: propSearchTerm = "", setUploadedPhotos }) {
             <button
               onClick={handlePrevPage}
               disabled={currentPage === 1}
-              className={`p-2 rounded-full font-medium text-white ${
+              className={`p-2 rounded-full font-medium ${
                 currentPage === 1
                   ? "bg-gray-600 cursor-not-allowed opacity-50"
-                  : "bg-teal-500 hover:bg-teal-600 transform hover:scale-105"
+                  : `${
+                      isNightMode
+                        ? "bg-teal-500 hover:bg-teal-600"
+                        : "bg-teal-500 hover:bg-teal-600"
+                    } transform hover:scale-105`
               } transition-all duration-300 focus:ring-2 focus:ring-teal-400 focus:outline-none`}
             >
               <svg
@@ -394,16 +470,26 @@ function Gallery({ searchTerm: propSearchTerm = "", setUploadedPhotos }) {
                 />
               </svg>
             </button>
-            <span className="text-gray-200 px-4 py-2 bg-teal-600 rounded-full text-sm sm:text-base font-medium">
+            <span
+              className={`px-4 py-2 rounded-full text-sm sm:text-base font-medium ${
+                isNightMode
+                  ? "bg-teal-600 text-gray-100"
+                  : "bg-teal-500 text-white"
+              }`}
+            >
               Page {currentPage} of {totalPages}
             </span>
             <button
               onClick={handleNextPage}
               disabled={currentPage === totalPages}
-              className={`p-2 rounded-full font-medium text-white ${
+              className={`p-2 rounded-full font-medium ${
                 currentPage === totalPages
                   ? "bg-gray-600 cursor-not-allowed opacity-50"
-                  : "bg-teal-500 hover:bg-teal-600 transform hover:scale-105"
+                  : `${
+                      isNightMode
+                        ? "bg-teal-500 hover:bg-teal-600"
+                        : "bg-teal-500 hover:bg-teal-600"
+                    } transform hover:scale-105`
               } transition-all duration-300 focus:ring-2 focus:ring-teal-400 focus:outline-none`}
             >
               <svg
@@ -424,10 +510,14 @@ function Gallery({ searchTerm: propSearchTerm = "", setUploadedPhotos }) {
             <button
               onClick={handleLastPage}
               disabled={currentPage === totalPages}
-              className={`px-4 py-2 rounded-full font-medium text-white text-sm sm:text-base min-w-[80px] ${
+              className={`px-4 py-2 rounded-full font-medium text-sm sm:text-base min-w-[80px] ${
                 currentPage === totalPages
                   ? "bg-gray-600 cursor-not-allowed opacity-50"
-                  : "bg-teal-500 hover:bg-teal-600 transform hover:scale-105"
+                  : `${
+                      isNightMode
+                        ? "bg-teal-500 hover:bg-teal-600"
+                        : "bg-teal-500 hover:bg-teal-600"
+                    } transform hover:scale-105`
               } transition-all duration-300 focus:ring-2 focus:ring-teal-400 focus:outline-none`}
             >
               Last
@@ -436,10 +526,18 @@ function Gallery({ searchTerm: propSearchTerm = "", setUploadedPhotos }) {
         )}
         {selectedPhoto && (
           <div
-            className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50"
+            className={`fixed inset-0 ${
+              isNightMode
+                ? "bg-black bg-opacity-75"
+                : "bg-gray-200 bg-opacity-75"
+            } flex items-center justify-center z-50`}
             onClick={closeLightbox}
           >
-            <div className="relative max-w-4xl">
+            <div
+              className={`relative max-w-4xl ${
+                isNightMode ? "bg-gray-800" : "bg-white"
+              } p-4 rounded-lg shadow-lg`}
+            >
               <img
                 src={selectedPhoto.urls.regular}
                 alt={selectedPhoto.description ?? "Photo"}
@@ -447,7 +545,9 @@ function Gallery({ searchTerm: propSearchTerm = "", setUploadedPhotos }) {
               />
               <button
                 onClick={closeLightbox}
-                className="absolute top-4 right-4 text-white text-2xl"
+                className={`absolute top-4 right-4 text-2xl ${
+                  isNightMode ? "text-white" : "text-gray-900"
+                }`}
               >
                 ×
               </button>
