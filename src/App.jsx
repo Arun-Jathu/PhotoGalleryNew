@@ -6,11 +6,10 @@ import Gallery from "./components/Gallery.jsx";
 import PhotoDetails from "./components/PhotoDetails.jsx";
 import "./App.css";
 
-// Main App component: Sets up routing, header, and search functionality
 function App() {
   const [searchTerm, setSearchTerm] = useState("");
   const [isHeaderExpanded, setIsHeaderExpanded] = useState(
-    () => window.innerWidth >= 640
+    window.innerWidth >= 640
   );
   const [uploadedPhotos, setUploadedPhotos] = useState(() => {
     const savedPhotos = localStorage.getItem("uploadedPhotos");
@@ -27,22 +26,29 @@ function App() {
     };
 
     window.addEventListener("resize", handleResize);
+    handleResize(); // Set initial state
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
   const toggleHeader = () => {
-    setIsHeaderExpanded(!isHeaderExpanded);
+    setIsHeaderExpanded((prev) => !prev);
   };
 
   const closeHeader = () => {
-    if (!window.innerWidth >= 640) {
+    if (window.innerWidth < 640) {
       setIsHeaderExpanded(false);
     }
   };
 
   const toggleNightMode = () => {
-    setIsNightMode(!isNightMode);
-    localStorage.setItem("nightMode", !isNightMode);
+    const newMode = !isNightMode;
+    setIsNightMode(newMode);
+    localStorage.setItem("nightMode", JSON.stringify(newMode));
+  };
+
+  const handleSearch = () => {
+    console.log("Search button clicked, searchTerm:", searchTerm);
+    // Ensure filtering is triggered (Gallery should handle this reactively)
   };
 
   return (
@@ -63,103 +69,151 @@ function App() {
           }`}
         >
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
-            <div className="flex items-center space-x-4">
-              <h1 className="text-xl font-medium text-teal-400 flex items-center hover:text-teal-300 transition-colors duration-200">
-                <svg
-                  className="w-6 h-6 mr-1"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"
-                  />
-                </svg>
-                <Link to="/" onClick={closeHeader}>
-                  Photo Gallery
-                </Link>
-              </h1>
-              <div className="flex items-center space-x-2">
-                <label className="relative inline-flex items-center cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={isNightMode}
-                    onChange={toggleNightMode}
-                    className="sr-only peer"
-                  />
-                  <div
-                    className={`w-11 h-6 ${
-                      isNightMode ? "bg-teal-600" : "bg-teal-200"
-                    } peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-teal-400 rounded-full peer peer-checked:bg-teal-600 after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-teal-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all ${
-                      isNightMode
-                        ? "peer-checked:after:translate-x-5"
-                        : "after:translate-x-0"
-                    }`}
-                  ></div>
-                  <span className="ml-2 text-teal-400">
-                    {isNightMode ? "🌙" : "🌞"}
-                  </span>
-                </label>
-              </div>
-            </div>
-            <div className="flex items-center space-x-6">
-              <button
-                className="sm:hidden text-teal-400 focus:outline-none"
-                onClick={toggleHeader}
-              >
-                <svg
-                  className="w-6 h-6"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d="M4 6h16M4 12h16m-7 6h7"
-                  />
-                </svg>
-              </button>
+            {/* Default Title Bar on Mobile */}
+            {window.innerWidth >= 640 || !isHeaderExpanded ? (
+              <>
+                <div className="flex items-center space-x-4">
+                  <h1 className="text-xl font-medium text-teal-400 flex items-center hover:text-teal-300 transition-colors duration-200">
+                    <svg
+                      className="w-6 h-6 mr-1"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
+                        d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"
+                      />
+                    </svg>
+                    <Link to="/" onClick={closeHeader}>
+                      Photo Gallery
+                    </Link>
+                  </h1>
+                </div>
+                <div className="flex items-center space-x-4">
+                  <button
+                    className="sm:hidden text-teal-400 focus:outline-none"
+                    onClick={toggleHeader}
+                  >
+                    <svg
+                      className="w-6 h-6"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
+                        d="M4 6h16M4 12h16m-7 6h7"
+                      />
+                    </svg>
+                  </button>
+                  <div className="hidden sm:flex items-center space-x-6">
+                    <div
+                      className={`relative flex items-center ${
+                        isNightMode
+                          ? "border-teal-600 bg-teal-800"
+                          : "border-teal-200 bg-teal-100"
+                      } rounded-full px-4 py-2 w-72`}
+                    >
+                      <input
+                        type="text"
+                        placeholder="Search photos by title"
+                        value={searchTerm}
+                        onChange={(e) => {
+                          console.log(
+                            "Search term updated to:",
+                            e.target.value
+                          );
+                          setSearchTerm(e.target.value);
+                        }}
+                        onClick={closeHeader}
+                        className={`w-full py-1 px-2 ${
+                          isNightMode
+                            ? "text-gray-100 bg-transparent placeholder-teal-400"
+                            : "text-gray-900 bg-transparent placeholder-teal-600"
+                        } focus:outline-none focus:ring-2 focus:ring-teal-500 rounded-full text-sm`}
+                      />
+                      {searchTerm && (
+                        <button
+                          onClick={() => {
+                            console.log("Clearing search term");
+                            setSearchTerm("");
+                          }}
+                          className="absolute right-10 text-teal-400 hover:text-teal-300 transition-colors duration-200"
+                        >
+                          <svg
+                            className="w-4 h-4"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                            xmlns="http://www.w3.org/2000/svg"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth="2"
+                              d="M6 18L18 6M6 6l12 12"
+                            />
+                          </svg>
+                        </button>
+                      )}
+                      <button
+                        onClick={handleSearch}
+                        className="bg-teal-500 text-white rounded-full p-2 hover:bg-teal-600 w-8 h-8 flex items-center justify-center"
+                      >
+                        <svg
+                          className="w-4 h-4"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth="2"
+                            d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                          />
+                        </svg>
+                      </button>
+                    </div>
+                    <a
+                      href="https://github.com/example-user/PhotoGalleryNew"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-teal-400 hover:text-teal-300 text-sm"
+                      onClick={closeHeader}
+                    >
+                      GitHub
+                    </a>
+                  </div>
+                </div>
+              </>
+            ) : null}
+            {/* Mobile Dropdown Menu */}
+            {window.innerWidth < 640 && isHeaderExpanded && (
               <div
-                className={`${
-                  isHeaderExpanded ? "" : "hidden"
-                } sm:flex items-center space-x-6`}
+                className={`sm:hidden absolute top-0 left-0 w-full ${
+                  isNightMode
+                    ? "bg-gray-900 bg-opacity-95"
+                    : "bg-white bg-opacity-95"
+                } rounded-lg p-6 shadow-lg z-20 border-t border-teal-600`}
               >
-                <div
-                  className={`relative flex items-center ${
-                    isNightMode
-                      ? "border-teal-600 bg-teal-800"
-                      : "border-teal-200 bg-teal-100"
-                  } rounded-full px-4 py-2 w-full sm:w-72`}
-                >
-                  <input
-                    type="text"
-                    placeholder="Search photos by title"
-                    value={searchTerm}
-                    onChange={(e) => {
-                      console.log("Search term changed to:", e.target.value);
-                      setSearchTerm(e.target.value);
-                    }}
-                    className={`w-full py-1 px-2 ${
-                      isNightMode
-                        ? "text-gray-100 bg-transparent placeholder-teal-400"
-                        : "text-gray-900 bg-transparent placeholder-teal-600"
-                    } focus:outline-none focus:ring-2 focus:ring-teal-500 rounded-full text-sm`}
-                    onClick={closeHeader}
-                  />
-                  {searchTerm && (
+                <div className="flex flex-col items-center space-y-6">
+                  {/* First Row: Navigation Icons */}
+                  <div className="flex w-full justify-between items-center">
                     <button
-                      onClick={() => setSearchTerm("")}
-                      className="absolute right-10 text-teal-400 hover:text-teal-300 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-teal-400 rounded"
+                      className="text-white text-xl focus:outline-none"
+                      onClick={toggleHeader}
                     >
                       <svg
-                        className="w-4 h-4"
+                        className="w-6 h-6"
                         fill="none"
                         stroke="currentColor"
                         viewBox="0 0 24 24"
@@ -173,67 +227,76 @@ function App() {
                         />
                       </svg>
                     </button>
-                  )}
-                  <button className="bg-teal-500 text-white rounded-full p-2 hover:bg-teal-600 focus:outline-none focus:ring-2 focus:ring-teal-400 w-8 h-8 flex items-center justify-center">
-                    <svg
-                      className="w-4 h-4"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                      xmlns="http://www.w3.org/2000/svg"
+                    <Link
+                      to="/"
+                      onClick={closeHeader}
+                      className="text-teal-400 flex items-center"
                     >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth="2"
-                        d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                      />
-                    </svg>
-                  </button>
-                </div>
-                <a
-                  href="https://github.com/example-user/PhotoGalleryNew"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-teal-400 hover:text-teal-300 text-sm transition-colors duration-200"
-                  onClick={closeHeader}
-                >
-                  GitHub
-                </a>
-              </div>
-            </div>
-          </div>
-          {/* Mobile Dropdown Menu */}
-          {!window.innerWidth >= 640 && isHeaderExpanded && (
-            <div
-              className={`sm:hidden absolute top-16 left-0 w-full ${
-                isNightMode
-                  ? "bg-gray-900 bg-opacity-95"
-                  : "bg-white bg-opacity-95"
-              } rounded-lg p-4 shadow-lg z-20`}
-            >
-              <div className="flex flex-col items-center space-y-4">
-                <button
-                  className="absolute top-2 right-2 text-white text-xl focus:outline-none"
-                  onClick={toggleHeader}
-                >
-                  ×
-                </button>
-                <div className="w-full max-w-md">
+                      <svg
+                        className="w-6 h-6"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth="2"
+                          d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"
+                        />
+                      </svg>
+                    </Link>
+                    <div className="flex items-center space-x-2">
+                      <label className="relative inline-flex items-center cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={isNightMode}
+                          onChange={toggleNightMode}
+                          className="sr-only peer"
+                        />
+                        <div
+                          className={`w-11 h-6 ${
+                            isNightMode ? "bg-teal-600" : "bg-teal-200"
+                          } rounded-full peer-focus:ring-2 peer-focus:ring-teal-400 peer-checked:bg-teal-600 after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-teal-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all ${
+                            isNightMode
+                              ? "peer-checked:after:translate-x-5"
+                              : "after:translate-x-0"
+                          }`}
+                        ></div>
+                        <span className="ml-2 text-teal-400">
+                          {isNightMode ? "🌙" : "🌞"}
+                        </span>
+                      </label>
+                    </div>
+                    <a
+                      href="https://github.com/example-user/PhotoGalleryNew"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-teal-400 hover:text-teal-300 text-sm"
+                      onClick={closeHeader}
+                    >
+                      GitHub
+                    </a>
+                  </div>
+                  {/* Second Row: Search Bar */}
                   <div
                     className={`relative flex items-center ${
-                      isNightMode ? "bg-teal-800" : "bg-teal-100"
-                    } rounded-full px-4 py-2`}
+                      isNightMode
+                        ? "bg-teal-800 border-teal-600"
+                        : "bg-teal-100 border-teal-200"
+                    } rounded-full px-4 py-2 w-full border`}
                   >
                     <input
                       type="text"
                       placeholder="Search photos by title"
                       value={searchTerm}
                       onChange={(e) => {
-                        console.log("Search term changed to:", e.target.value);
+                        console.log("Search term updated to:", e.target.value);
                         setSearchTerm(e.target.value);
                       }}
-                      className={`w-full py-1 px-2 ${
+                      onClick={closeHeader}
+                      className={`w-full py-2 px-3 ${
                         isNightMode
                           ? "text-gray-100 bg-transparent placeholder-teal-400"
                           : "text-gray-900 bg-transparent placeholder-teal-600"
@@ -241,8 +304,11 @@ function App() {
                     />
                     {searchTerm && (
                       <button
-                        onClick={() => setSearchTerm("")}
-                        className="absolute right-12 text-teal-400 hover:text-teal-300 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-teal-400 rounded"
+                        onClick={() => {
+                          console.log("Clearing search term");
+                          setSearchTerm("");
+                        }}
+                        className="absolute right-12 text-teal-400 hover:text-teal-300 transition-colors duration-200"
                       >
                         <svg
                           className="w-4 h-4"
@@ -260,7 +326,10 @@ function App() {
                         </svg>
                       </button>
                     )}
-                    <button className="bg-teal-500 text-white rounded-full p-2 hover:bg-teal-600 focus:outline-none focus:ring-2 focus:ring-teal-400 w-8 h-8 flex items-center justify-center">
+                    <button
+                      onClick={handleSearch}
+                      className="bg-teal-500 text-white rounded-full p-2 hover:bg-teal-600 w-8 h-8 flex items-center justify-center"
+                    >
                       <svg
                         className="w-4 h-4"
                         fill="none"
@@ -278,23 +347,13 @@ function App() {
                     </button>
                   </div>
                 </div>
-                <a
-                  href="https://github.com/example-user/PhotoGalleryNew"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className={`text-teal-400 hover:text-teal-300 text-sm transition-colors duration-200 px-4 py-2 rounded-full ${
-                    isNightMode ? "bg-teal-800" : "bg-teal-100"
-                  } w-full max-w-md text-center`}
-                >
-                  GitHub
-                </a>
               </div>
-            </div>
-          )}
+            )}
+          </div>
         </header>
+
         {/* Main Content */}
         <main className="w-full flex-grow">
-          {/* App Routes */}
           <Routes>
             <Route
               path="/"
@@ -317,6 +376,7 @@ function App() {
             />
           </Routes>
         </main>
+
         {/* Footer */}
         <footer
           className={`mt-12 py-6 w-full border-t ${
@@ -331,7 +391,7 @@ function App() {
               href="https://github.com/example-user/PhotoGalleryNew"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-teal-400 hover:text-teal-300 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-teal-400 rounded"
+              className="text-teal-400 hover:text-teal-300 transition-colors duration-200"
             >
               GitHub Portfolio
             </a>
