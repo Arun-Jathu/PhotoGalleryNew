@@ -18,7 +18,7 @@ function Gallery({
   const [tempDescription, setTempDescription] = useState("");
   const [selectedFile, setSelectedFile] = useState(null);
   const [selectedPhoto, setSelectedPhoto] = useState(null);
-  const [localSearchTerm, setLocalSearchTerm] = useState(propSearchTerm); // Local state for search
+  const [localSearchTerm, setLocalSearchTerm] = useState(propSearchTerm); // Initialize with prop
   const photosPerPage = 8;
 
   // Initialize uploadedPhotos from localStorage and sync with prop
@@ -31,6 +31,14 @@ function Gallery({
   useEffect(() => {
     setUploadedPhotos(uploadedPhotos);
   }, [uploadedPhotos, setUploadedPhotos]);
+
+  // Sync localSearchTerm with propSearchTerm
+  useEffect(() => {
+    console.log("Syncing localSearchTerm with propSearchTerm:", propSearchTerm);
+    if (localSearchTerm !== propSearchTerm) {
+      setLocalSearchTerm(propSearchTerm);
+    }
+  }, [propSearchTerm, localSearchTerm]);
 
   // Calculate derived values
   const filteredPhotos = [...photos, ...uploadedPhotos].filter(
@@ -159,6 +167,14 @@ function Gallery({
 
   const openLightbox = (photo) => setSelectedPhoto(photo);
   const closeLightbox = () => setSelectedPhoto(null);
+
+  // Function to trim title to a fixed length
+  const trimTitle = (title, maxLength = 20) => {
+    if (title.length > maxLength) {
+      return title.slice(0, maxLength) + "...";
+    }
+    return title;
+  };
 
   if (loading)
     return (
@@ -316,12 +332,12 @@ function Gallery({
                   </div>
                   <div className="p-4 flex flex-col">
                     <h3
-                      className={`text-base font-medium line-clamp-2 mb-2 ${
+                      className={`text-base font-medium line-clamp-1 mb-2 ${
                         isNightMode ? "text-gray-200" : "text-gray-800"
                       }`}
                     >
                       <span title={photo.description ?? "Untitled"}>
-                        {photo.description ?? "Untitled"}
+                        {trimTitle(photo.description ?? "Untitled")}
                       </span>
                     </h3>
                     <p

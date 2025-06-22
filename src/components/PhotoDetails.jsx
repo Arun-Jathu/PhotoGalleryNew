@@ -51,6 +51,27 @@ function PhotoDetails({ uploadedPhotos, isNightMode }) {
     )
     .slice(0, 3); // Get up to 3 related photos from the same album
 
+  useEffect(() => {
+    if (nextPhotoId) {
+      const nextPhoto = allPhotos.find((p) => p.id === nextPhotoId);
+      if (nextPhoto) {
+        const img = new Image();
+        img.src = nextPhoto.urls?.regular;
+      }
+    }
+  }, [nextPhotoId, allPhotos]);
+
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === "ArrowRight" && nextPhotoId)
+        navigate(`/photo/${nextPhotoId}`);
+      if (e.key === "ArrowLeft" && prevPhotoId)
+        navigate(`/photo/${prevPhotoId}`);
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [nextPhotoId, prevPhotoId, navigate]);
+
   // Navigate to the next photo when clicking the image
   const handleImageClick = () => {
     if (nextPhotoId) {

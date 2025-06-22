@@ -11,66 +11,62 @@ function App() {
   const [isHeaderExpanded, setIsHeaderExpanded] = useState(
     window.innerWidth >= 640
   );
+  const [windowWidth, setWindowWidth] = useState(window.innerWidth);
   const [uploadedPhotos, setUploadedPhotos] = useState(() => {
-    const savedPhotos = localStorage.getItem("uploadedPhotos");
-    return savedPhotos ? JSON.parse(savedPhotos) : [];
+    const saved = localStorage.getItem("uploadedPhotos");
+    return saved ? JSON.parse(saved) : [];
   });
   const [isNightMode, setIsNightMode] = useState(() => {
-    const savedMode = localStorage.getItem("nightMode");
-    return savedMode ? JSON.parse(savedMode) : true; // Default to night mode
+    const saved = localStorage.getItem("nightMode");
+    return saved ? JSON.parse(saved) : true;
   });
 
   useEffect(() => {
     const handleResize = () => {
-      setIsHeaderExpanded(window.innerWidth >= 640);
+      setWindowWidth(window.innerWidth);
+      if (window.innerWidth >= 640) {
+        setIsHeaderExpanded(true);
+      }
     };
-
     window.addEventListener("resize", handleResize);
-    handleResize(); // Set initial state
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  const toggleHeader = () => {
-    setIsHeaderExpanded((prev) => !prev);
-  };
+  const toggleHeader = () => setIsHeaderExpanded((prev) => !prev);
 
   const closeHeader = () => {
-    if (window.innerWidth < 640) {
-      setIsHeaderExpanded(false);
-    }
+    if (windowWidth < 640) setIsHeaderExpanded(false);
   };
 
   const toggleNightMode = () => {
-    const newMode = !isNightMode;
-    setIsNightMode(newMode);
-    localStorage.setItem("nightMode", JSON.stringify(newMode));
+    setIsNightMode((prev) => {
+      localStorage.setItem("nightMode", JSON.stringify(!prev));
+      return !prev;
+    });
   };
 
   const handleSearch = () => {
-    console.log("Search button clicked, searchTerm:", searchTerm);
-    // Ensure filtering is triggered (Gallery should handle this reactively)
+    console.log("Search clicked, term:", searchTerm);
   };
 
   return (
     <Provider store={store}>
       <div
-        className={`min-h-screen flex flex-col font-sans ${
+        className={`min-h-screen flex flex-col font-sans transition-colors duration-300 ease-in-out ${
           isNightMode
             ? "bg-gray-900 text-gray-100"
             : "bg-gradient-to-b from-gray-50 to-gray-100 text-gray-900"
         }`}
       >
-        {/* Header */}
         <header
-          className={`w-full sticky top-0 z-10 border-b ${
+          className={`w-full sticky top-0 z-10 border-b transition-colors duration-300 ${
             isNightMode
               ? "bg-gray-900 border-gray-800"
               : "bg-gray-100 border-gray-200"
           }`}
         >
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
-            {/* Default Title Bar on Mobile */}
-            {window.innerWidth >= 640 || !isHeaderExpanded ? (
+            {(windowWidth >= 640 || !isHeaderExpanded) && (
               <>
                 <div className="flex items-center space-x-4">
                   <h1 className="text-xl font-medium text-teal-400 flex items-center hover:text-teal-300 transition-colors duration-200">
@@ -79,7 +75,6 @@ function App() {
                       fill="none"
                       stroke="currentColor"
                       viewBox="0 0 24 24"
-                      xmlns="http://www.w3.org/2000/svg"
                     >
                       <path
                         strokeLinecap="round"
@@ -92,6 +87,29 @@ function App() {
                       Photo Gallery
                     </Link>
                   </h1>
+
+                  <div className="flex items-center space-x-2">
+                    <label className="relative inline-flex items-center cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={isNightMode}
+                        onChange={toggleNightMode}
+                        className="sr-only peer"
+                      />
+                      <div
+                        className={`w-11 h-6 ${
+                          isNightMode ? "bg-teal-600" : "bg-teal-200"
+                        } rounded-full peer-focus:ring-2 peer-focus:ring-teal-400 peer-checked:bg-teal-600 after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-teal-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all ${
+                          isNightMode
+                            ? "peer-checked:after:translate-x-5"
+                            : "after:translate-x-0"
+                        }`}
+                      />
+                      <span className="ml-2 text-teal-400">
+                        {isNightMode ? "🌙" : "🌞"}
+                      </span>
+                    </label>
+                  </div>
                 </div>
                 <div className="flex items-center space-x-4">
                   <button
@@ -103,7 +121,6 @@ function App() {
                       fill="none"
                       stroke="currentColor"
                       viewBox="0 0 24 24"
-                      xmlns="http://www.w3.org/2000/svg"
                     >
                       <path
                         strokeLinecap="round"
@@ -125,14 +142,8 @@ function App() {
                         type="text"
                         placeholder="Search photos by title"
                         value={searchTerm}
-                        onChange={(e) => {
-                          console.log(
-                            "Search term updated to:",
-                            e.target.value
-                          );
-                          setSearchTerm(e.target.value);
-                        }}
-                        onClick={closeHeader}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                        onClick={(e) => e.stopPropagation()}
                         className={`w-full py-1 px-2 ${
                           isNightMode
                             ? "text-gray-100 bg-transparent placeholder-teal-400"
@@ -141,10 +152,7 @@ function App() {
                       />
                       {searchTerm && (
                         <button
-                          onClick={() => {
-                            console.log("Clearing search term");
-                            setSearchTerm("");
-                          }}
+                          onClick={() => setSearchTerm("")}
                           className="absolute right-10 text-teal-400 hover:text-teal-300 transition-colors duration-200"
                         >
                           <svg
@@ -152,7 +160,6 @@ function App() {
                             fill="none"
                             stroke="currentColor"
                             viewBox="0 0 24 24"
-                            xmlns="http://www.w3.org/2000/svg"
                           >
                             <path
                               strokeLinecap="round"
@@ -172,7 +179,6 @@ function App() {
                           fill="none"
                           stroke="currentColor"
                           viewBox="0 0 24 24"
-                          xmlns="http://www.w3.org/2000/svg"
                         >
                           <path
                             strokeLinecap="round"
@@ -195,9 +201,8 @@ function App() {
                   </div>
                 </div>
               </>
-            ) : null}
-            {/* Mobile Dropdown Menu */}
-            {window.innerWidth < 640 && isHeaderExpanded && (
+            )}
+            {windowWidth < 640 && isHeaderExpanded && (
               <div
                 className={`sm:hidden absolute top-0 left-0 w-full ${
                   isNightMode
@@ -206,18 +211,16 @@ function App() {
                 } rounded-lg p-6 shadow-lg z-20 border-t border-teal-600`}
               >
                 <div className="flex flex-col items-center space-y-6">
-                  {/* First Row: Navigation Icons */}
                   <div className="flex w-full justify-between items-center">
                     <button
-                      className="text-white text-xl focus:outline-none"
                       onClick={toggleHeader}
+                      className="text-white text-xl focus:outline-none"
                     >
                       <svg
                         className="w-6 h-6"
                         fill="none"
                         stroke="currentColor"
                         viewBox="0 0 24 24"
-                        xmlns="http://www.w3.org/2000/svg"
                       >
                         <path
                           strokeLinecap="round"
@@ -229,15 +232,14 @@ function App() {
                     </button>
                     <Link
                       to="/"
-                      onClick={closeHeader}
                       className="text-teal-400 flex items-center"
+                      onClick={closeHeader}
                     >
                       <svg
                         className="w-6 h-6"
                         fill="none"
                         stroke="currentColor"
                         viewBox="0 0 24 24"
-                        xmlns="http://www.w3.org/2000/svg"
                       >
                         <path
                           strokeLinecap="round"
@@ -263,7 +265,7 @@ function App() {
                               ? "peer-checked:after:translate-x-5"
                               : "after:translate-x-0"
                           }`}
-                        ></div>
+                        />
                         <span className="ml-2 text-teal-400">
                           {isNightMode ? "🌙" : "🌞"}
                         </span>
@@ -279,23 +281,20 @@ function App() {
                       GitHub
                     </a>
                   </div>
-                  {/* Second Row: Search Bar */}
                   <div
                     className={`relative flex items-center ${
                       isNightMode
                         ? "bg-teal-800 border-teal-600"
                         : "bg-teal-100 border-teal-200"
                     } rounded-full px-4 py-2 w-full border`}
+                    onClick={(e) => e.stopPropagation()}
                   >
                     <input
                       type="text"
                       placeholder="Search photos by title"
                       value={searchTerm}
-                      onChange={(e) => {
-                        console.log("Search term updated to:", e.target.value);
-                        setSearchTerm(e.target.value);
-                      }}
-                      onClick={closeHeader}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                      onClick={(e) => e.stopPropagation()}
                       className={`w-full py-2 px-3 ${
                         isNightMode
                           ? "text-gray-100 bg-transparent placeholder-teal-400"
@@ -304,10 +303,7 @@ function App() {
                     />
                     {searchTerm && (
                       <button
-                        onClick={() => {
-                          console.log("Clearing search term");
-                          setSearchTerm("");
-                        }}
+                        onClick={() => setSearchTerm("")}
                         className="absolute right-12 text-teal-400 hover:text-teal-300 transition-colors duration-200"
                       >
                         <svg
@@ -315,7 +311,6 @@ function App() {
                           fill="none"
                           stroke="currentColor"
                           viewBox="0 0 24 24"
-                          xmlns="http://www.w3.org/2000/svg"
                         >
                           <path
                             strokeLinecap="round"
@@ -335,7 +330,6 @@ function App() {
                         fill="none"
                         stroke="currentColor"
                         viewBox="0 0 24 24"
-                        xmlns="http://www.w3.org/2000/svg"
                       >
                         <path
                           strokeLinecap="round"
@@ -352,7 +346,6 @@ function App() {
           </div>
         </header>
 
-        {/* Main Content */}
         <main className="w-full flex-grow">
           <Routes>
             <Route
@@ -377,9 +370,8 @@ function App() {
           </Routes>
         </main>
 
-        {/* Footer */}
         <footer
-          className={`mt-12 py-6 w-full border-t ${
+          className={`mt-12 py-6 w-full border-t transition-colors duration-300 ${
             isNightMode
               ? "bg-gray-900 border-gray-800 text-gray-400"
               : "bg-gray-100 border-gray-200 text-gray-600"
@@ -393,7 +385,7 @@ function App() {
               rel="noopener noreferrer"
               className="text-teal-400 hover:text-teal-300 transition-colors duration-200"
             >
-              GitHub Portfolio
+              GitHub | Portfolio
             </a>
           </div>
         </footer>
