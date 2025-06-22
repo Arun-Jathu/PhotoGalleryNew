@@ -1,8 +1,8 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { Link } from "react-router-dom";
 import { fetchPhotos } from "../features/photosSlice.js";
-import { motion } from "framer-motion";
+import { motion } from "framer-motion"; // Corrected import
 import imageCompression from "browser-image-compression";
 
 // Gallery component: Displays a paginated grid of photos with upload and lightbox features
@@ -20,6 +20,9 @@ function Gallery({
   const [selectedPhoto, setSelectedPhoto] = useState(null);
   const [localSearchTerm, setLocalSearchTerm] = useState(propSearchTerm); // Initialize with prop
   const photosPerPage = 8;
+
+  // State to store dominant colors for each photo
+  const [dominantColors, setDominantColors] = useState({});
 
   // Initialize uploadedPhotos from localStorage and sync with prop
   const [uploadedPhotos, setLocalUploadedPhotos] = useState(() => {
@@ -94,6 +97,51 @@ function Gallery({
     setUploadedPhotos,
   ]);
 
+  // Compute dominant color for each photo
+  useEffect(() => {
+    const computeColors = async () => {
+      const colors = {};
+      for (const photo of currentPhotos) {
+        const color = await new Promise((resolve) => {
+          const canvas = document.createElement("canvas");
+          const ctx = canvas.getContext("2d");
+          const img = new Image();
+          img.crossOrigin = "Anonymous";
+          img.src = photo.urls?.small || "https://via.placeholder.com/150";
+          img.onload = () => {
+            canvas.width = img.width;
+            canvas.height = img.height;
+            ctx.drawImage(img, 0, 0);
+            const imageData = ctx.getImageData(
+              0,
+              0,
+              canvas.width,
+              canvas.height
+            ).data;
+            let r = 0,
+              g = 0,
+              b = 0;
+            for (let i = 0; i < imageData.length; i += 4) {
+              r += imageData[i];
+              g += imageData[i + 1];
+              b += imageData[i + 2];
+            }
+            const pixelCount = imageData.length / 4;
+            resolve(
+              `rgb(${Math.round(r / pixelCount)}, ${Math.round(
+                g / pixelCount
+              )}, ${Math.round(b / pixelCount)})`
+            );
+          };
+          img.onerror = () => resolve("rgb(0, 0, 0)"); // Fallback for failed loads
+        });
+        colors[photo.id] = color;
+      }
+      setDominantColors((prev) => ({ ...prev, ...colors }));
+    };
+    computeColors();
+  }, [currentPhotos]);
+
   const handleUpload = async () => {
     if (selectedFile) {
       const options = {
@@ -165,8 +213,25 @@ function Gallery({
     setTempDescription("");
   };
 
-  const openLightbox = (photo) => setSelectedPhoto(photo);
-  const closeLightbox = () => setSelectedPhoto(null);
+  // Lightbox navigation
+  const currentIndex = currentPhotos.findIndex(
+    (p) => p.id === selectedPhoto?.id
+  );
+  const prevPhoto =
+    currentPhotos[currentIndex - 1] || currentPhotos[currentPhotos.length - 1];
+  const nextPhoto = currentPhotos[currentIndex + 1] || currentPhotos[0];
+
+  // Handle keyboard events for lightbox
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (!selectedPhoto) return;
+      if (e.key === "ArrowLeft") setSelectedPhoto(prevPhoto);
+      if (e.key === "ArrowRight") setSelectedPhoto(nextPhoto);
+      if (e.key === "Escape") setSelectedPhoto(null);
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [selectedPhoto, prevPhoto, nextPhoto]);
 
   // Function to trim title to a fixed length
   const trimTitle = (title, maxLength = 20) => {
@@ -295,146 +360,165 @@ function Gallery({
             transition={{ duration: 0.5 }}
             className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6"
           >
-            {currentPhotos.map((photo) => (
-              <motion.div
-                key={photo.id}
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.3 }}
-                className="relative"
-              >
-                <article
-                  className={`overflow-hidden rounded-xl shadow-lg border transform hover:scale-105 transition-transform duration-300 ${
-                    isNightMode
-                      ? "bg-gray-800 border-gray-700/50"
-                      : "bg-white border-gray-200"
-                  }`}
+            {currentPhotos.map((photo) => {
+              const dominantColor = dominantColors[photo.id] || "rgb(0, 0, 0)";
+              return (
+                <motion.div
+                  key={photo.id}
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ duration: 0.3 }}
+                  className="relative"
                 >
-                  <div
-                    onClick={() => openLightbox(photo)}
-                    className="cursor-pointer"
+                  <article
+                    className={`overflow-hidden rounded-xl shadow-lg border transform hover:scale-105 transition-transform duration-300 ${
+                      isNightMode
+                        ? "bg-gray-800 border-gray-700/50"
+                        : "bg-white border-gray-200"
+                    }`}
+                    style={{ boxShadow: `0 8px 16px ${dominantColor}60` }} // Stronger shadow
                   >
-                    <img
-                      src={
-                        photo.urls?.small || "https://via.placeholder.com/150"
-                      }
-                      alt={photo.description ?? "Photo"}
-                      loading="lazy"
-                      className="block h-48 w-full object-cover hover:opacity-90 transition-opacity duration-300"
-                      onError={(e) => {
-                        console.log(
-                          "Image load failed for:",
-                          photo.urls?.small
-                        );
-                        e.target.src = "https://via.placeholder.com/150";
-                      }}
-                    />
-                  </div>
-                  <div className="p-4 flex flex-col">
-                    <h3
-                      className={`text-base font-medium line-clamp-1 mb-2 ${
-                        isNightMode ? "text-gray-200" : "text-gray-800"
-                      }`}
+                    <div
+                      onClick={() => setSelectedPhoto(photo)}
+                      className="cursor-pointer relative"
                     >
-                      <span title={photo.description ?? "Untitled"}>
-                        {trimTitle(photo.description ?? "Untitled")}
-                      </span>
-                    </h3>
-                    <p
-                      className={`text-sm mb-2 ${
-                        isNightMode ? "text-gray-400" : "text-gray-500"
-                      }`}
-                    >
-                      Photo #{photo.id}
-                    </p>
-                    {editingPhotoId === photo.id ? (
-                      <div className="space-y-4">
-                        <textarea
-                          value={tempDescription}
-                          onChange={(e) => setTempDescription(e.target.value)}
-                          placeholder="Enter a description..."
-                          className={`w-full p-3 rounded-lg border focus:outline-none focus:ring-2 focus:ring-teal-500 transition-all duration-300 ${
-                            isNightMode
-                              ? "bg-gray-700 text-gray-100 border-gray-600"
-                              : "bg-white text-gray-900 border-gray-300"
-                          }`}
-                          rows="3"
+                      <img
+                        src={
+                          photo.urls?.small || "https://via.placeholder.com/150"
+                        }
+                        alt={photo.description ?? "Photo"}
+                        loading="lazy"
+                        className="block h-48 w-full object-cover hover:opacity-90 transition-opacity duration-300"
+                        onError={(e) => {
+                          console.log(
+                            "Image load failed for:",
+                            photo.urls?.small
+                          );
+                          e.target.src = "https://via.placeholder.com/150";
+                        }}
+                      />
+                      <div
+                        className="absolute top-2 right-2 bg-white bg-opacity-80 dark:bg-gray-800 dark:bg-opacity-80 p-1 rounded-lg shadow-md flex items-center space-x-2"
+                        style={{ backdropFilter: "blur(5px)" }}
+                      >
+                        <div
+                          className="w-8 h-8 rounded transform hover:scale-110 transition-transform duration-300"
+                          style={{ backgroundColor: dominantColor }}
+                          title={`Dominant Color: ${dominantColor}`}
                         />
-                        <div className="flex space-x-3">
-                          <button
-                            onClick={() => handleSaveDescription(photo.id)}
-                            className="bg-teal-500 text-white px-4 py-2 rounded-full font-medium hover:bg-teal-600 transition-all duration-300"
-                          >
-                            Save
-                          </button>
-                          <button
-                            onClick={handleCancelEdit}
-                            className={`px-4 py-2 rounded-full font-medium transition-all duration-300 ${
-                              isNightMode
-                                ? "bg-gray-600 text-gray-100 hover:bg-gray-500"
-                                : "bg-gray-300 text-gray-700 hover:bg-gray-400"
-                            }`}
-                          >
-                            Cancel
-                          </button>
-                        </div>
+                        <span className="text-xs font-medium text-gray-700 dark:text-gray-200">
+                          Color
+                        </span>
                       </div>
-                    ) : (
-                      <div className="space-y-2">
-                        {localStorage.getItem(
-                          `photo-description-${photo.id}`
-                        ) ? (
-                          <p
-                            className={`text-sm line-clamp-2 ${
-                              isNightMode ? "text-gray-300" : "text-gray-600"
+                    </div>
+                    <div className="p-4 flex flex-col">
+                      <h3
+                        className={`text-base font-medium line-clamp-1 mb-2 ${
+                          isNightMode ? "text-gray-200" : "text-gray-800"
+                        }`}
+                      >
+                        <span title={photo.description ?? "Untitled"}>
+                          {trimTitle(photo.description ?? "Untitled")}
+                        </span>
+                      </h3>
+                      <p
+                        className={`text-sm mb-2 ${
+                          isNightMode ? "text-gray-400" : "text-gray-500"
+                        }`}
+                      >
+                        Photo #{photo.id}
+                      </p>
+                      {editingPhotoId === photo.id ? (
+                        <div className="space-y-4">
+                          <textarea
+                            value={tempDescription}
+                            onChange={(e) => setTempDescription(e.target.value)}
+                            placeholder="Enter a description..."
+                            className={`w-full p-3 rounded-lg border focus:outline-none focus:ring-2 focus:ring-teal-500 transition-all duration-300 ${
+                              isNightMode
+                                ? "bg-gray-700 text-gray-100 border-gray-600"
+                                : "bg-white text-gray-900 border-gray-300"
+                            }`}
+                            rows="3"
+                          />
+                          <div className="flex space-x-3">
+                            <button
+                              onClick={() => handleSaveDescription(photo.id)}
+                              className="bg-teal-500 text-white px-4 py-2 rounded-full font-medium hover:bg-teal-600 transition-all duration-300"
+                            >
+                              Save
+                            </button>
+                            <button
+                              onClick={handleCancelEdit}
+                              className={`px-4 py-2 rounded-full font-medium transition-all duration-300 ${
+                                isNightMode
+                                  ? "bg-gray-600 text-gray-100 hover:bg-gray-500"
+                                  : "bg-gray-300 text-gray-700 hover:bg-gray-400"
+                              }`}
+                            >
+                              Cancel
+                            </button>
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="space-y-2">
+                          {localStorage.getItem(
+                            `photo-description-${photo.id}`
+                          ) ? (
+                            <p
+                              className={`text-sm line-clamp-2 ${
+                                isNightMode ? "text-gray-300" : "text-gray-600"
+                              }`}
+                            >
+                              {localStorage.getItem(
+                                `photo-description-${photo.id}`
+                              )}
+                            </p>
+                          ) : (
+                            <p
+                              className={`text-sm italic ${
+                                isNightMode ? "text-gray-400" : "text-gray-500"
+                              }`}
+                            >
+                              No description available.
+                            </p>
+                          )}
+                          <button
+                            onClick={() =>
+                              handleEditDescription(
+                                photo.id,
+                                localStorage.getItem(
+                                  `photo-description-${photo.id}`
+                                )
+                              )
+                            }
+                            className={`transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-teal-400 rounded text-sm ${
+                              isNightMode
+                                ? "text-teal-400 hover:text-teal-300"
+                                : "text-teal-600 hover:text-teal-500"
                             }`}
                           >
                             {localStorage.getItem(
                               `photo-description-${photo.id}`
-                            )}
-                          </p>
-                        ) : (
-                          <p
-                            className={`text-sm italic ${
-                              isNightMode ? "text-gray-400" : "text-gray-500"
-                            }`}
-                          >
-                            No description available.
-                          </p>
-                        )}
-                        <button
-                          onClick={() =>
-                            handleEditDescription(
-                              photo.id,
-                              localStorage.getItem(
-                                `photo-description-${photo.id}`
-                              )
                             )
-                          }
-                          className={`transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-teal-400 rounded text-sm ${
-                            isNightMode
-                              ? "text-teal-400 hover:text-teal-300"
-                              : "text-teal-600 hover:text-teal-500"
-                          }`}
+                              ? "Edit Description"
+                              : "Add Description"}
+                          </button>
+                        </div>
+                      )}
+                      <div className="mt-4">
+                        <Link
+                          to={`/photo/${photo.id}`}
+                          className="inline-block bg-teal-500 text-white px-6 py-2 rounded-full font-medium hover:bg-teal-600 transition-all duration-300"
                         >
-                          {localStorage.getItem(`photo-description-${photo.id}`)
-                            ? "Edit Description"
-                            : "Add Description"}
-                        </button>
+                          View Details
+                        </Link>
                       </div>
-                    )}
-                    <div className="mt-4">
-                      <Link
-                        to={`/photo/${photo.id}`}
-                        className="inline-block bg-teal-500 text-white px-6 py-2 rounded-full font-medium hover:bg-teal-600 transition-all duration-300"
-                      >
-                        View Details
-                      </Link>
                     </div>
-                  </div>
-                </article>
-              </motion.div>
-            ))}
+                  </article>
+                </motion.div>
+              );
+            })}
           </motion.div>
         )}
         {filteredPhotos.length > 0 && (
@@ -541,18 +625,22 @@ function Gallery({
           </div>
         )}
         {selectedPhoto && (
-          <div
-            className={`fixed inset-0 ${
-              isNightMode
-                ? "bg-black bg-opacity-75"
-                : "bg-gray-200 bg-opacity-75"
-            } flex items-center justify-center z-50`}
-            onClick={closeLightbox}
+          <motion.div
+            className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={(e) => {
+              if (e.target === e.currentTarget) setSelectedPhoto(null);
+            }}
           >
-            <div
-              className={`relative max-w-4xl ${
+            <motion.div
+              className={`relative max-w-4xl p-4 rounded-lg ${
                 isNightMode ? "bg-gray-800" : "bg-white"
-              } p-4 rounded-lg shadow-lg`}
+              }`}
+              initial={{ scale: 0.9 }}
+              animate={{ scale: 1 }}
+              transition={{ duration: 0.3 }}
             >
               <img
                 src={selectedPhoto.urls.regular}
@@ -560,15 +648,51 @@ function Gallery({
                 className="max-h-[80vh] max-w-full"
               />
               <button
-                onClick={closeLightbox}
-                className={`absolute top-4 right-4 text-2xl ${
-                  isNightMode ? "text-white" : "text-gray-900"
-                }`}
+                onClick={() => setSelectedPhoto(prevPhoto)}
+                className="absolute left-4 top-1/2 transform -translate-y-1/2 text-white text-2xl focus:outline-none"
+                disabled={currentIndex === 0}
+              >
+                <svg
+                  className="w-8 h-8"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M15 19l-7-7 7-7"
+                  />
+                </svg>
+              </button>
+              <button
+                onClick={() => setSelectedPhoto(nextPhoto)}
+                className="absolute right-4 top-1/2 transform -translate-y-1/2 text-white text-2xl focus:outline-none"
+                disabled={currentIndex === currentPhotos.length - 1}
+              >
+                <svg
+                  className="w-8 h-8"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M9 5l7 7-7 7"
+                  />
+                </svg>
+              </button>
+              <button
+                onClick={() => setSelectedPhoto(null)}
+                className="absolute top-4 right-4 text-3xl text-white focus:outline-none"
               >
                 ×
               </button>
-            </div>
-          </div>
+            </motion.div>
+          </motion.div>
         )}
       </div>
     </div>
