@@ -83,7 +83,7 @@ The output will be in the `dist` folder, which you can deploy to a hosting servi
 - **Day Mode Desktop**:  
   ![Gallery Desktop Day](screenshots/DayModeDesktop.png)
 - **Day Mode Photo Details View (Desktop)**:  
-  ![Photo Details Desktop Day](screenshots/DaytModeDesktopPD.png)
+  ![Photo Details Desktop Day](screenshots/DayModeDesktopPD.png)
 - **Night Mode (Mobile)**:  
   ![Mobile Night](screenshots/MobileNight.png)
 - **Day mode (Mobile)**:  
