@@ -188,11 +188,11 @@ function PhotoDetails({ uploadedPhotos, isNightMode }) {
         />
         {/* Overlay for Title and Metadata */}
         <div
-          className={`absolute inset-0 ${
+          className={`absolute inset-0 flex flex-col justify-end p-6 sm:p-8 lg:p-12 ${
             isNightMode
               ? "bg-gradient-to-t from-gray-900/80 to-transparent"
-              : "bg-gradient-to-t from-gray-200/80 to-transparent"
-          } flex flex-col justify-end p-6 sm:p-8 lg:p-12`}
+              : ""
+          }`}
         >
           <h1
             className={`text-2xl sm:text-3xl lg:text-4xl font-bold ${
@@ -275,15 +275,15 @@ function PhotoDetails({ uploadedPhotos, isNightMode }) {
               {relatedPhotos.map((relatedPhoto) => (
                 <motion.div
                   key={relatedPhoto.id}
-                  initial={{ opacity: 0, scale: 0.95 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ duration: 0.3 }}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.4 }}
                   className="relative"
                 >
                   <article
-                    className={`overflow-hidden rounded-xl shadow-lg border transform hover:scale-105 transition-transform duration-300 ${
+                    className={`overflow-hidden rounded-2xl shadow-xl border transform hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 ${
                       isNightMode
-                        ? "bg-gray-900 border-gray-700/50"
+                        ? "bg-gray-800 border-gray-700/50"
                         : "bg-white border-gray-200"
                     }`}
                   >
@@ -298,19 +298,15 @@ function PhotoDetails({ uploadedPhotos, isNightMode }) {
                           "Related Photo"
                         }
                         loading="lazy"
-                        className="block h-40 w-full object-contain bg-gray-800"
+                        className="w-full h-48 object-cover"
                         onError={(e) =>
                           (e.target.src = "https://picsum.photos/150")
                         }
                       />
-                      <div
-                        className={`p-4 flex flex-col h-32 ${
-                          isNightMode ? "bg-gray-800" : "bg-white"
-                        }`}
-                      >
+                      <div className="p-5">
                         <h3
-                          className={`text-base font-medium line-clamp-2 mb-2 ${
-                            isNightMode ? "text-gray-200" : "text-gray-800"
+                          className={`text-lg font-semibold line-clamp-2 mb-2 ${
+                            isNightMode ? "text-gray-200" : "text-gray-900"
                           }`}
                         >
                           {relatedPhoto.title ||
@@ -319,7 +315,7 @@ function PhotoDetails({ uploadedPhotos, isNightMode }) {
                         </h3>
                         <p
                           className={`text-sm ${
-                            isNightMode ? "text-gray-400" : "text-gray-500"
+                            isNightMode ? "text-gray-400" : "text-gray-600"
                           }`}
                         >
                           Photo #{relatedPhoto.id}

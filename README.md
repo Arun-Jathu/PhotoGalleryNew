@@ -1,6 +1,6 @@
 # Photo Gallery App
 
-The Photo Gallery App is a modern, responsive web application built with React and Redux, designed to display and manage a collection of photos. It fetches photo data from the JSONPlaceholder API (5000 photos) and allows users to browse photos in a grid view, view detailed information about each photo, and add/edit descriptions. The app features a sleek dark theme with teal accents, consistent design across all interfaces, and a focus on usability and accessibility. This project was developed as part of the application for the Frontend Developer position at GrayCorp.
+The Photo Gallery App is a modern, responsive web application built with React and Redux, designed to display and manage a collection of photos. It fetches photo data from the Unsplash API and allows users to browse photos in a grid view, view and detailed information, upload their own images, toggle between light and night modes, and explore enhanced visual features like color palette extraction and zoomable image modals. The app features a sleek design with teal accents, consistent usability, and accessibility focus. This project was developed as part of the application for the Frontend Developer position.
 
 ## Live Demo
 
@@ -61,9 +61,13 @@ The output will be in the `dist` folder, which you can deploy to a hosting servi
 
 ## Features
 
-- **Photo Grid View**: Browse photos in a responsive grid layout with search and pagination (8 photos per page). Each card includes a "View Details" button for easy navigation to the photo’s details page. Fetches all 5000 photos from the JSONPlaceholder API.
+- **Photo Grid View**: Browse photos in a responsive grid layout with search and pagination (8 photos per page). Each card includes a "View Details" button for easy navigation to the photo’s details page.
 - **Photo Details View**: View detailed information about each photo, including metadata (photo ID, album ID) and up to 3 related photos from the same album.
 - **Description Editing**: Add and edit descriptions for photos directly from both the Gallery and Photo Details pages, with data persisted in `localStorage`.
+- **Night Mode Toggle**: Switch between light and dark themes for better viewing comfort, with dynamic styling adjustments.
+- **Image Upload Functionality**: Upload personal photos with compression to optimize size, displayed alongside fetched photos.
+- **Color Palette Extraction**: Automatically extracts and displays the dominant color of each photo as a swatch and shadow effect for enhanced visual appeal.
+- **Image Modal for Zoom**: Open a full-screen modal to zoom and navigate through photos using arrow keys or buttons.
 - **Consistent Design**: Modern dark theme with teal accents, consistent card designs, and hover effects across all interfaces.
 - **Responsive Layout**: Fully responsive design that works seamlessly on desktop and mobile devices.
 - **Accessibility**: Keyboard navigation, focus states for interactive elements, and screen reader support.
@@ -72,14 +76,18 @@ The output will be in the `dist` folder, which you can deploy to a hosting servi
 
 ## Screenshots
 
-- **Gallery View (Desktop)**:  
-  ![Gallery Desktop](screenshots/gallery-desktop.png)
-- **Gallery View (Mobile)**:  
-  ![Gallery Mobile](screenshots/gallery-mobile.png)
-- **Photo Details View (Desktop)**:  
-  ![Photo Details Desktop](screenshots/photo-details-desktop.png)
-- **Photo Details View (Mobile)**:  
-  ![Photo Details Mobile](screenshots/photo-details-mobile.png)
+- **Night Mode Desktop**:  
+  ![Gallery Desktop Night](screenshots/NightModeDesktop.png)
+- **Night Mode Photo Details View (Desktop)**:  
+  ![Photo Details Desktop Night](screenshots/NightModeDesktopPD.png)
+- **Day Mode Desktop**:  
+  ![Gallery Desktop Day](screenshots/DayModeDesktop.png)
+- **Day Mode Photo Details View (Desktop)**:  
+  ![Photo Details Desktop Day](screenshots/DaytModeDesktopPD.png)
+- **Night Mode (Mobile)**:  
+  ![Mobile Night](screenshots/MobileNight.png)
+- **Day mode (Mobile)**:  
+  ![Mobile Day](screenshots/MobileNight.png)
 
 ## Project Structure
 
@@ -130,8 +138,6 @@ This approach ensures that the app’s state is predictable, scalable, and easy 
 
 ## Submission Details
 
-This project is submitted as part of the application for the **Frontend Developer** position at **GrayCorp**. The GitHub repository for this project can be found at:
-
 [GitHub Repository](https://github.com/Arun-Jathu/PhotoGalleryNew)
 
 A live demo of the app is available at:
@@ -139,5 +145,3 @@ A live demo of the app is available at:
 [Live Demo](https://jathuphotogalleryapp.netlify.app/)
 
 For any questions, please contact me at [arunjathu0@gmail.com].
-
-**Submitted to:** careers@graycorp.io
