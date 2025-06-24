@@ -61,9 +61,9 @@ function App() {
         <header
           className={`w-full sticky top-0 z-10 border-b transition-colors duration-300 ${
             isNightMode
-              ? "bg-gray-900 border-gray-800"
-              : "bg-gray-100 border-gray-200"
-          }`}
+              ? "bg-gray-900/80 border-gray-800"
+              : "bg-gray-100/80 border-gray-200"
+          } backdrop-blur-md`}
         >
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
             {(windowWidth >= 640 || !isHeaderExpanded) && (
@@ -206,9 +206,9 @@ function App() {
               <div
                 className={`sm:hidden absolute top-0 left-0 w-full ${
                   isNightMode
-                    ? "bg-gray-900 bg-opacity-95"
-                    : "bg-white bg-opacity-95"
-                } rounded-lg p-6 shadow-lg z-20 border-t border-teal-600`}
+                    ? "bg-gray-900/80 bg-opacity-95"
+                    : "bg-white/80 bg-opacity-95"
+                } rounded-lg p-6 shadow-lg z-20 border-t border-teal-600 backdrop-blur-md`}
               >
                 <div className="flex flex-col items-center space-y-6">
                   <div className="flex w-full justify-between items-center">
